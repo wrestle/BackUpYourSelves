@@ -1,4 +1,4 @@
-#ifndef SETPATH_H_INCLUDED
+﻿#ifndef SETPATH_H_INCLUDED
 #define SETPATH_H_INCLUDED
 
 #include <stdio.h>
@@ -9,17 +9,17 @@
 #define SELF_BU_PATH_MAX_SIZE 4096
 #define SELF_LOAD_DEFAULT_PATH "C:/User-wu/backup/"
 
-/** ��ȡ�����ñ���λ�� **/
+/** 获取并设置备份位置 **/
 void getEnterPath();
 
-/** ���ص�ǰ�ı���·�� **/
+/** 返回当前的备份路径 **/
 const char * getBackUpPath();
 
-/** ��ʹ�ù��Ĵ洢·�� д���ļ��б��� **/
+/** 将使用过的存储路径 写入文件中保存 **/
 void storePathHistory(const char[]);
 
-/** ��ȡ�洢����ʷ·��
-**  ������ʽΪ ÿ��·��Ϊһ������Ԫ�أ� ���һ��Ԫ��Ϊ NULL
+/** 获取存储的历史路径
+**  返回形式为 每个路径为一个数组元素， 最后一个元素为 NULL
 **/
 void showPathHistory();
 

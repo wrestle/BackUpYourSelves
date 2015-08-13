@@ -1,33 +1,33 @@
-#include "showFile.h"
+ï»¿#include "showFile.h"
 
 /**
- ** ÏÔÊ¾µ±Ç°Â·¾¶ÏÂµÄÎÄ¼şÓëÎÄ¼ş¼Ğ
+ ** æ˜¾ç¤ºå½“å‰è·¯å¾„ä¸‹çš„æ–‡ä»¶ä¸æ–‡ä»¶å¤¹
 **/
 void showAllFileInDir(const char * DirPath, int shownmode)
 {
-    /** Èç¹û»ñµÃ¾ä±úÊ§°Ü£¬ÔÙ³¢ÊÔÈı´Î **/
+    /** å¦‚æœè·å¾—å¥æŸ„å¤±è´¥ï¼Œå†å°è¯•ä¸‰æ¬¡ **/
     int times = 0;
-    /** ²Ù×÷Ê±µÄ±ØÒª²ÎÊı **/
+    /** æ“ä½œæ—¶çš„å¿…è¦å‚æ•° **/
     HANDLE fileHandle;
     WIN32_FIND_DATAA fileData;
     LARGE_INTEGER fileSize;
 
     size_t length = strlen(DirPath);
-    char dirBuf[SELF_MAX_PATH_LENGTH]; //Â·¾¶
-    char dirFileBuf[SELF_MAX_PATH_LENGTH]; //ÎÄ¼ş
+    char dirBuf[SELF_MAX_PATH_LENGTH]; //è·¯å¾„
+    char dirFileBuf[SELF_MAX_PATH_LENGTH]; //æ–‡ä»¶
 
-    /** ¸´ÖÆÒ»·İÂ·¾¶µ½±¾µØ±äÁ¿ÉÏ **/
+    /** å¤åˆ¶ä¸€ä»½è·¯å¾„åˆ°æœ¬åœ°å˜é‡ä¸Š **/
     strcpy(dirBuf, DirPath);
 
-    /** Ô¤´¦ÀíÂ·¾¶£¬·ûºÏWindowsº¯ÊıµÄÒªÇó **/
-    if(length == 1) /** ¸ÃÇé¿öÊÇÎªÁËµ±Â·¾¶ÊÇÅÌ·ûÊ±µÄ´¦Àí **/
+    /** é¢„å¤„ç†è·¯å¾„ï¼Œç¬¦åˆWindowså‡½æ•°çš„è¦æ±‚ **/
+    if(length == 1) /** è¯¥æƒ…å†µæ˜¯ä¸ºäº†å½“è·¯å¾„æ˜¯ç›˜ç¬¦æ—¶çš„å¤„ç† **/
     {
         strcpy(dirFileBuf, dirBuf);
         strcat(dirFileBuf, ":/");
 
         strcat(dirBuf, "://*");
     }
-    else if(dirBuf[length-1] == '/') /** Èç¹ûÊÇÊÖ¶¯ÊäÈëµÄÂ·¾¶¿ÉÄÜ×îºó»á´øÓĞ / **/
+    else if(dirBuf[length-1] == '/') /** å¦‚æœæ˜¯æ‰‹åŠ¨è¾“å…¥çš„è·¯å¾„å¯èƒ½æœ€åä¼šå¸¦æœ‰ / **/
     {
         strcpy(dirFileBuf, dirBuf);
         strcat(dirFileBuf, "/");
@@ -39,7 +39,7 @@ void showAllFileInDir(const char * DirPath, int shownmode)
         strcpy(dirFileBuf, dirBuf);
         strcat(dirFileBuf, "/");
 
-        strcat(dirBuf, "//*"); /** ÊÖ¶¯ÊäÈë¿ÉÄÜ×îºó²»´ø / »òÕßÓÉº¯Êı»ñµÃµÄÂ·¾¶ **/
+        strcat(dirBuf, "//*"); /** æ‰‹åŠ¨è¾“å…¥å¯èƒ½æœ€åä¸å¸¦ / æˆ–è€…ç”±å‡½æ•°è·å¾—çš„è·¯å¾„ **/
     }
 
     setjmp(sAFID_jump);
@@ -53,7 +53,7 @@ void showAllFileInDir(const char * DirPath, int shownmode)
             return;
     }
     fprintf(stdout, "-------------------------------------\n");
-    /** ±éÀúÊä³öÂ·¾¶ÏÂµÄËùÓĞÎÄ¼şÃûÒÔ¼°ÎÄ¼ş¼ĞÃû **/
+    /** éå†è¾“å‡ºè·¯å¾„ä¸‹çš„æ‰€æœ‰æ–‡ä»¶åä»¥åŠæ–‡ä»¶å¤¹å **/
     do{
         char tempFileODirBuf[SELF_MAX_FILE_LENGTH];
         strcpy(tempFileODirBuf, dirFileBuf);

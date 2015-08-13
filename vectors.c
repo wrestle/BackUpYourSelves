@@ -1,8 +1,8 @@
-#include "vectors.h"
+ï»¿#include "vectors.h"
 
 int newVectors(vectors* objects)
 {
-    int times = 0;  //ÖØÊÔ´ÎÊı
+    int times = 0;  //é‡è¯•æ¬¡æ•°
     vectors* localvec = objects;
     char**   localArr = NULL;
 /*
@@ -27,13 +27,13 @@ int newVectors(vectors* objects)
         longjmp(secJmp, 1);//  second jump from here
         else
         {
-            //free(localvec); ³ıÈ¥·ÖÅälocalvec
+            //free(localvec); é™¤å»åˆ†é…localvec
             return 2;
         }
     }
 
-    localvec->capcity  = 20; // ÈİÁ¿
-    localvec->position = 0;  // µ±Ç°Î»ÖÃ
+    localvec->capcity  = 20; // å®¹é‡
+    localvec->position = 0;  // å½“å‰ä½ç½®
 
     //objects            = localvec;
     objects->nameArray = localArr;
@@ -85,8 +85,8 @@ int pushback(vectors* objects, const char* elements)
     {
         localVec->capcity *= 2;
         setjmp(fstJmp);
-        char** check = realloc(localVec->nameArray, //Ô­µØÖ·
-                            (localVec->capcity)*sizeof(char*)); //ÏÖ´óĞ¡
+        char** check = realloc(localVec->nameArray, //åŸåœ°å€
+                            (localVec->capcity)*sizeof(char*)); //ç°å¤§å°
         if(!check)
         {
             if(times++ < 2)

@@ -1,4 +1,4 @@
-#include "backup.h"
+ï»¿#include "backup.h"
 
 void showBUSelect()
 {
@@ -62,7 +62,7 @@ void showBUSelect()
 
 void backup(int mode, const char* path, const char* bupath)
 {
-    //²Ù×÷ÎÄ¼ş²ÎÊı
+    //æ“ä½œæ–‡ä»¶å‚æ•°
     HANDLE fileHandle;
     WIN32_FIND_DATAA fileData;
 
@@ -72,10 +72,10 @@ void backup(int mode, const char* path, const char* bupath)
     char backupTo[SELF_BU_PATH_MAX_SIZE];
     char dirBuf[SELF_BU_PATH_MAX_SIZE];
 
-    if(!mode)/** Â·¾¶Ô¤´¦Àí **/
+    if(!mode)/** è·¯å¾„é¢„å¤„ç† **/
     {
         GetCurrentDirectory(SELF_BU_PATH_MAX_SIZE, backupFrom); // C:/dir
-        replSymb(backupFrom); // '\' Ìæ»»Îª '/'
+        replSymb(backupFrom); // '\' æ›¿æ¢ä¸º '/'
         strcat(backupFrom, "/");
     }
     else if(mode == 1)
@@ -96,7 +96,7 @@ void backup(int mode, const char* path, const char* bupath)
     strcat(dirBuf, "/*");
     strcpy(backupTo, bupath);
     if(backupTo[strlen(backupTo)-1] != '/')
-        strcat(backupTo, "/");  //ÔÚµİ¹éµÄÊ±ºò£¬ĞèÒªÏòÂ·¾¶Ä©Î²Ìí¼Ó /
+        strcat(backupTo, "/");  //åœ¨é€’å½’çš„æ—¶å€™ï¼Œéœ€è¦å‘è·¯å¾„æœ«å°¾æ·»åŠ  /
 
     fileHandle = FindFirstFile(dirBuf, &fileData);
     if( fileHandle == INVALID_HANDLE_VALUE)
@@ -113,7 +113,7 @@ void backup(int mode, const char* path, const char* bupath)
         char tempFileDirBuf[SELF_BU_PATH_MAX_SIZE];
         char tempBackUpPath[SELF_BU_PATH_MAX_SIZE];
         strcpy(tempBackUpPath, backupTo);
-        strcpy(tempFileDirBuf, backupFrom); //¿½±´Ò»·İÎŞ '/*' ½áÎ²µÄÂ·¾¶ÓÃÓÚ²¹ÆëÍêÕûÂ·¾¶
+        strcpy(tempFileDirBuf, backupFrom); //æ‹·è´ä¸€ä»½æ—  '/*' ç»“å°¾çš„è·¯å¾„ç”¨äºè¡¥é½å®Œæ•´è·¯å¾„
         //fprintf(stdout, "handle is %p <<<<<<<<<\n", fileHandle);
         if(fileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
         {

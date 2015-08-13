@@ -1,4 +1,4 @@
-#ifndef VECTORS_H_INCLUDED
+ï»¿#ifndef VECTORS_H_INCLUDED
 #define VECTORS_H_INCLUDED
 #include <stdio.h>
 #include <setjmp.h>
@@ -12,36 +12,36 @@ typedef const char* (*fpRemove)(vectors* );
 typedef void        (*fpDestructor)(vectors* );
 
 struct _vectors{               //         | 0  | 1  | 2  | 3  | 4  | ...
-    char** nameArray; //Ö÷ÌåÄ£ĞÍ |str1|str2|str3|str4|str5| ...
-    int             position;  //×ø±ê
-    size_t          capcity;   //ÈİÁ¿
-    fpPushBack      PushBack;  // ²Ù×÷1 Ñ¹Èë²Ù×÷
-    fpRemove        Remove;    // ²Ù×÷2 É¾³ı²Ù×÷
-    fpDestructor    Delete;    // ²Ù×÷3 ÊÍ·Å²Ù×÷
+    char** nameArray; //ä¸»ä½“æ¨¡å‹ |str1|str2|str3|str4|str5| ...
+    int             position;  //åæ ‡
+    size_t          capcity;   //å®¹é‡
+    fpPushBack      PushBack;  // æ“ä½œ1 å‹å…¥æ“ä½œ
+    fpRemove        Remove;    // æ“ä½œ2 åˆ é™¤æ“ä½œ
+    fpDestructor    Delete;    // æ“ä½œ3 é‡Šæ”¾æ“ä½œ
 };
 
 /**
-**  ÏòÏòÁ¿Ä©Î²ÖĞÌí¼ÓÒ»¸öÔªËØ£¬²¢ÇÒ·µ»Ø×ø±ê , -1 ÎªÄÚ´æ·ÖÅäÊ§°Ü
-**  -2 ÎªÀ©´óvectorsÈİÁ¿Ê§°Ü  -3 Îªµ½´ïÀ©ÈİÉÏÏŞ£¬²»ÔÙÔÊĞíÀ©Èİ
-**  ÔÚº¯ÊıÖĞ·ÖÅäÄÚ´æÀ´Ìí¼ÓÔªËØ
+**  å‘å‘é‡æœ«å°¾ä¸­æ·»åŠ ä¸€ä¸ªå…ƒç´ ï¼Œå¹¶ä¸”è¿”å›åæ ‡ , -1 ä¸ºå†…å­˜åˆ†é…å¤±è´¥
+**  -2 ä¸ºæ‰©å¤§vectorså®¹é‡å¤±è´¥  -3 ä¸ºåˆ°è¾¾æ‰©å®¹ä¸Šé™ï¼Œä¸å†å…è®¸æ‰©å®¹
+**  åœ¨å‡½æ•°ä¸­åˆ†é…å†…å­˜æ¥æ·»åŠ å…ƒç´ 
 **/
 int pushback(vectors * objects, const char * elements);
 
-/** É¾³ı×îºóÒ»¸öÔªËØ£¬²¢·µ»ØÆäÖµ
-**  ÆäÖĞÉ¾³ı²¢·ÇÕæÉ¾³ı(²»ÊÍ·ÅÄÚ´æ)£¬ ÈôÎŞÔªËØÔò·µ»Ø NULL
+/** åˆ é™¤æœ€åä¸€ä¸ªå…ƒç´ ï¼Œå¹¶è¿”å›å…¶å€¼
+**  å…¶ä¸­åˆ é™¤å¹¶éçœŸåˆ é™¤(ä¸é‡Šæ”¾å†…å­˜)ï¼Œ è‹¥æ— å…ƒç´ åˆ™è¿”å› NULL
 **/
 const char* remove_s(vectors* objects);
 
-/** ¹¹Ôì
-**  ·µ»Ø0±íÊ¾³É¹¦£¬·µ»Ø1±íÊ¾  vectors ÄÚ´æ·ÖÅäÊ§°Ü£¬
-**  ·µ»Ø2±íÊ¾ vectors.nameAarray ÄÚ´æ·ÖÅäÊ§°Ü
+/** æ„é€ 
+**  è¿”å›0è¡¨ç¤ºæˆåŠŸï¼Œè¿”å›1è¡¨ç¤º  vectors å†…å­˜åˆ†é…å¤±è´¥ï¼Œ
+**  è¿”å›2è¡¨ç¤º vectors.nameAarray å†…å­˜åˆ†é…å¤±è´¥
 **/
 int newVectors(vectors* objects);
 
-/** ÊÍ·Å **/
+/** é‡Šæ”¾ **/
 void delVectors(vectors* objects);
 
-/** ·Ö±ğÓÃÓÚ newVectors, newVectors, pushback **/
+/** åˆ†åˆ«ç”¨äº newVectors, newVectors, pushback **/
 jmp_buf fstJmp, secJmp, trdJmp;
 
 #endif // VECTORS_H_INCLUDED

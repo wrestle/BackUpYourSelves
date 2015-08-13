@@ -1,4 +1,4 @@
-#ifndef BACKUP_H_INCLUDED
+О╩©#ifndef BACKUP_H_INCLUDED
 #define BACKUP_H_INCLUDED
 
 #include <io.h>
@@ -13,9 +13,9 @@ jmp_buf forJmp;
 
 void showBUSelect();
 
-/**╡╩м╛╣д╠╦╥щдёй╫**/
-// 1 рт╣╠г╟б╥╬╤н╙╦Ыд©б╪ё╛╠╦╥щкЫспвснд╪Ч╨мвсд©б╪
-// 2 рт╣╠г╟б╥╬╤╣д╦Ыб╥╬╤н╙╦Ыд©б╪ё╛╠╦╥щкЫсп╣двснд╪Ч╨мвсд©б╪
+/**Д╦█Е░▄Г └Е╓┤Д╩╫Ф╗║Е╪▐**/
+// 1 Д╩╔Е╫⌠Е┴█Х╥╞Е╬└Д╦╨Ф═╧Г⌡╝Е╫∙О╪▄Е╓┤Д╩╫Ф┴─Ф°┴Е╜░Ф√┤Д╩╤Е▓▄Е╜░Г⌡╝Е╫∙
+// 2 Д╩╔Е╫⌠Е┴█Х╥╞Е╬└Г └Ф═╧Х╥╞Е╬└Д╦╨Ф═╧Г⌡╝Е╫∙О╪▄Е╓┤Д╩╫Ф┴─Ф°┴Г └Е╜░Ф√┤Д╩╤Е▓▄Е╜░Г⌡╝Е╫∙
 void backup(int mode, const char* path, const char* bupath);
 
 #endif // BACKUP_H_INCLUDED

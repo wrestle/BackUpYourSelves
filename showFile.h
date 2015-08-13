@@ -1,4 +1,4 @@
-#ifndef SHOWFILE_H_INCLUDED
+ï»¿#ifndef SHOWFILE_H_INCLUDED
 #define SHOWFILE_H_INCLUDED
 #include <windows.h>
 #include <string.h>
@@ -12,15 +12,15 @@
 #define SELF_MAX_FILE_LENGTH 256
 #define SELF_LONGJMP_RET_VALUE 1
 
-/** ×¨ÓÃÓÚ showAllFileInDir º¯ÊıµÄ longjmp **/
+/** ä¸“ç”¨äº showAllFileInDir å‡½æ•°çš„ longjmp **/
 jmp_buf sAFID_jump;
-/** mode = 0 ÏÔÊ¾µ±Ç°Ä¿Â¼ÏÂµÄÎÄ¼şÓëÄ¿Â¼
- ** TODO mode = 1 µİ¹éÏÔÊ¾ËùÓĞ
+/** mode = 0 æ˜¾ç¤ºå½“å‰ç›®å½•ä¸‹çš„æ–‡ä»¶ä¸ç›®å½•
+ ** TODO mode = 1 é€’å½’æ˜¾ç¤ºæ‰€æœ‰
 **/
 void showAllFileInDir(const char * DirPath, int shownmode);
 
 void showReadMe();
 
-/** »»µôÂ·¾¶ÖĞµÄ '\', »»Îª '/' **/
+/** æ¢æ‰è·¯å¾„ä¸­çš„ '\', æ¢ä¸º '/' **/
 void replSymb(char *);
 #endif // SHOWFILE_H_INCLUDED

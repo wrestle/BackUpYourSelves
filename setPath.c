@@ -1,13 +1,13 @@
-#include "setPath.h"
+ï»¿#include "setPath.h"
 
-static char PathBuf[SELF_BU_PATH_MAX_SIZE] = SELF_LOAD_DEFAULT_PATH; //ÓÃÓÚ´æ·Å±¸·İµÄÂ·¾¶
+static char PathBuf[SELF_BU_PATH_MAX_SIZE] = SELF_LOAD_DEFAULT_PATH; //ç”¨äºå­˜æ”¾å¤‡ä»½çš„è·¯å¾„
 //static char* PathHisBuf[SELF_PATH_HISTIRY_MAX_NUM] = {NULL}
 
-/** »ñÈ¡ºÍÉèÖÃ±¸·İÂ·¾¶ **/
+/** è·å–å’Œè®¾ç½®å¤‡ä»½è·¯å¾„ **/
 void getEnterPath()
 {
     int intJudge = 0;
-    char tmpBuf[SELF_BU_PATH_MAX_SIZE]; /**ÁÙÊ±»º³åÇø**/
+    char tmpBuf[SELF_BU_PATH_MAX_SIZE]; /**ä¸´æ—¶ç¼“å†²åŒº**/
     printf("Enter The Path You want!\n");
     while(1)
     {
@@ -35,7 +35,7 @@ void getEnterPath()
     return;
 }
 
-/** ´æ´¢Ê±¸ñÊ½Îª£ºÂ·¾¶ Ê±¼ä **/
+/** å­˜å‚¨æ—¶æ ¼å¼ä¸ºï¼šè·¯å¾„ æ—¶é—´ **/
 void storePathHistory(const char path[])
 {
     time_t timep;
@@ -70,7 +70,7 @@ void showPathHistory()
     return;
 }
 
-/** ·µ»Øµ±Ç°±¸·İ´æ´¢Â·¾¶ **/
+/** è¿”å›å½“å‰å¤‡ä»½å­˜å‚¨è·¯å¾„ **/
 const char * getBackUpPath()
 {
     return PathBuf;
