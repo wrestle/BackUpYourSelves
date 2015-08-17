@@ -2,13 +2,14 @@
 #define BACKUP_H_INCLUDED
 
 #include <io.h>
-#include <windows.h>
 #include <time.h>
-#include <stdlib.h>
+#include <process.h>
+#include <Windows.h>
 
 #include "setPath.h"
 #include "vectors.h"
-#include "showFile.h"
+
+
 jmp_buf forJmp;
 
 void showBUSelect();
@@ -18,4 +19,6 @@ void showBUSelect();
 // 2 以当前路径的根路径为根目录，备份所有的子文件和子目录
 void backup(int mode, const char* path, const char* bupath);
 
+unsigned int __stdcall callBackup(void * pSelect);
+unsigned int __stdcall callCopyFile(void* para);
 #endif // BACKUP_H_INCLUDED

@@ -21,6 +21,5 @@ void showAllFileInDir(const char * DirPath, int shownmode);
 
 void showReadMe();
 
-/** 换掉路径中的 '\', 换为 '/' **/
-void replSymb(char *);
+
 #endif // SHOWFILE_H_INCLUDED

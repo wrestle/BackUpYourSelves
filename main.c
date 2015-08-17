@@ -2,7 +2,7 @@
 #include <memory.h>
 #include <stdlib.h>
 #include <string.h>
-#include <windows.h>
+#include <Windows.h>
 #include <tchar.h>
 
 #include "showFile.h"
@@ -43,9 +43,6 @@ int main(void)
             memset(buf, 0, 256*sizeof(char));
             printf("Back Up Begin! \n");
             showBUSelect();
-            //printf("Enter the Path: ");
-            //scanf("%s", buf);
-            //showAllFileInDir(buf, 0);
             printf("Back Up End!   \n");
             break;
         case 2 :

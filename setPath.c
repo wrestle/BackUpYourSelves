@@ -45,6 +45,7 @@ void storePathHistory(const char path[])
     if(!input)
     {
         fprintf(stderr, "OPEN OR CREATE \"PathHistory.txt\" Fail!\n");
+		return;
     }
 
     fprintf(input, "%s %s", path, ctime(&timep));
@@ -57,9 +58,12 @@ void showPathHistory()
     char outBufName[SELF_BU_PATH_MAX_SIZE];
 
     FILE* reading = fopen("PathHistory.txt", "r");
-    if(!reading)
-        fprintf(stderr, "OPEN \"PathHistory.txt\" Fail!");
-    for(int i = 1;i <= 10 && (!feof(reading));++i)
+	if (!reading)
+	{
+		fprintf(stderr, "OPEN \"PathHistory.txt\" Fail!");
+		return;
+	}
+	for(int i = 1;i <= 10 && (!feof(reading));++i)
     {
         fgets(outBufName, SELF_BU_PATH_MAX_SIZE*sizeof(char), reading);
         fprintf(stdout, "%2d. %s",i , outBufName);
@@ -74,4 +78,15 @@ void showPathHistory()
 const char * getBackUpPath()
 {
     return PathBuf;
+}
+
+void replSymb(char * source)
+{
+	size_t len = strlen(source), i;
+	for (i = 0; i <= len; ++i)
+	{
+		if (source[i] == '\\')
+			source[i] = '/';
+	}
+	return;
 }

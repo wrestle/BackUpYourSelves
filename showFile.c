@@ -95,14 +95,3 @@ void showReadMe()
     system("Pause");
     return;
 }
-
-void replSymb(char * source)
-{
-    size_t len = strlen(source), i;
-    for(i = 0;i <= len;++i)
-    {
-        if(source[i] == '\\')
-            source[i] = '/';
-    }
-    return;
-}
