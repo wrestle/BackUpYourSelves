@@ -5,16 +5,15 @@ HANDLE vecEmpty, vecFull; //两个 Semaphore
 HANDLE pushThread;  // 将路径加入队列中的线程
 CRITICAL_SECTION inputSec, testSec;
 
+// 计算时间
+clock_t start, finish;
+double Total_time;
+
 void showBUSelect()
 {
-	// 计算时间
-	LARGE_INTEGER l1, l2;
-	LARGE_INTEGER m_liPerfStart;
-	int time;
-
     char tmpBuf[256];
     int selects;
-	HANDLE copyThread[10]; //复制文件的线程
+	HANDLE copyThread[3]; //复制文件的线程
 
 	InitializeCriticalSection(&inputSec);
 	InitializeCriticalSection(&testSec);
@@ -44,8 +43,7 @@ void showBUSelect()
         memset(tmpBuf, 0, 256*sizeof(char));
 		newVectors(&filesVec);  // 初始化文件队列
 
-		QueryPerformanceFrequency(&l1);              //初始化时间
-		QueryPerformanceCounter(&m_liPerfStart);
+		
         switch(selects)
         {
         case 1: // 取消 case 1  和 case 2 的选项功能，因为实际上没有用处
@@ -72,12 +70,12 @@ void showBUSelect()
 			*/
         case 3 :
 			pushThread = (HANDLE)_beginthreadex(NULL, 0, callBackup, &selects, 0, NULL);
-			for (int i = 0; i < 10; ++i)
+			for (int i = 0; i < 3; ++i)
 			{
 				copyThread[i] = (HANDLE)_beginthreadex(NULL, 0, callCopyFile, NULL, 0, NULL);
 			}
 			WaitForSingleObject(pushThread, INFINITE);
-			WaitForMultipleObjects(10, copyThread, TRUE, INFINITE);
+			WaitForMultipleObjects(3, copyThread, TRUE, INFINITE);
 			printf("All Thread Exit!\n");
             break;
         case 4 :
@@ -85,9 +83,9 @@ void showBUSelect()
         }
 
 		// 计算时间
-		QueryPerformanceCounter(&l2);
-		time = (((l2.QuadPart - m_liPerfStart.QuadPart) * 1000) / l1.QuadPart);
-		printf("Time cost is %d ms\n", time);
+		finish = clock();
+		Total_time = (double)(finish - start) / CLOCKS_PER_SEC;
+		printf("Time cost is %f s\n", Total_time);
 		
 		// 销毁线程使用过的句柄
 		CloseHandle(pushThread);
@@ -109,8 +107,8 @@ void backup(int mode, const char* path, const char* bupath)
     char backupFrom[SELF_BU_PATH_MAX_SIZE];
     char backupTo[SELF_BU_PATH_MAX_SIZE];
     char dirBuf[SELF_BU_PATH_MAX_SIZE];
-	
-    if(!mode)/** 路径预处理 **/
+	/*
+    if(!mode)
     {
         GetCurrentDirectory(SELF_BU_PATH_MAX_SIZE, backupFrom); // C:/dir
         replSymb(backupFrom); // '\' 替换为 '/'
@@ -122,6 +120,7 @@ void backup(int mode, const char* path, const char* bupath)
         strcat(backupFrom, ":/");
     }
     else
+		*/
     {
         int len = strlen(path);
         strcpy(backupFrom, path);
@@ -191,7 +190,7 @@ unsigned int __stdcall callBackup(void * pSelect)
 		fprintf(stdout, " Enter the Full Path You want to BackUp\n");
 		fgets(tmpBuf, 256, stdin);
 		sscanf(tmpBuf, "%s", tmpPath);
-
+		start = clock();
 		backup(2, tmpPath, getBackUpPath());
 	}
 	else
@@ -207,20 +206,19 @@ unsigned int __stdcall callCopyFile(void * para)
 	DWORD isExit;
 	vectors*   address = &filesVec;
 	combine* localCom;
-	//int empty;
+	int empty;
 	while (1)
 	{
-		/*
 		EnterCriticalSection(&testSec);
 		GetExitCodeThread(pushThread, &isExit);
 		empty = address->emptys;
 		LeaveCriticalSection(&testSec);
 		if (isExit != STILL_ACTIVE && empty)
 		{
-			puts("Push Thread is End!\n");
+			//puts("Push Thread is End!\n");
 			break;
 		}
-		*/
+		
 		isExit = WaitForSingleObject(vecFull, 30000);
 		if (isExit == WAIT_TIMEOUT)
 			break;
