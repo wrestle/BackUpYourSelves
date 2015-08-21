@@ -1,5 +1,5 @@
 ﻿#include "backup.h"
-
+#define SELF_THREADS_LIMIT 5
 vectors filesVec;
 HANDLE vecEmpty, vecFull; //两个 Semaphore
 HANDLE pushThread;  // 将路径加入队列中的线程
@@ -13,7 +13,7 @@ void showBUSelect()
 {
     char tmpBuf[256];
     int selects;
-	HANDLE copyThread[3]; //复制文件的线程
+	HANDLE copyThread[SELF_THREADS_LIMIT]; //复制文件的线程
 
 	InitializeCriticalSection(&inputSec);
 	InitializeCriticalSection(&testSec);
@@ -46,6 +46,7 @@ void showBUSelect()
 		
         switch(selects)
         {
+			int case_three;
         case 1: // 取消 case 1  和 case 2 的选项功能，因为实际上没有用处
 			/*
 			pushThread = (HANDLE)_beginthreadex(NULL, 0, callBackup, &selects, 0, NULL);
@@ -69,13 +70,14 @@ void showBUSelect()
             break;
 			*/
         case 3 :
-			pushThread = (HANDLE)_beginthreadex(NULL, 0, callBackup, &selects, 0, NULL);
-			for (int i = 0; i < 3; ++i)
+			case_three = selects;
+			pushThread = (HANDLE)_beginthreadex(NULL, 0, callBackup, &case_three, 0, NULL);
+			for (int i = 0; i < SELF_THREADS_LIMIT; ++i)
 			{
 				copyThread[i] = (HANDLE)_beginthreadex(NULL, 0, callCopyFile, NULL, 0, NULL);
 			}
 			WaitForSingleObject(pushThread, INFINITE);
-			WaitForMultipleObjects(3, copyThread, TRUE, INFINITE);
+			WaitForMultipleObjects(SELF_THREADS_LIMIT, copyThread, TRUE, INFINITE);
 			printf("All Thread Exit!\n");
             break;
         case 4 :
@@ -104,23 +106,10 @@ void backup(int mode, const char* path, const char* bupath)
     HANDLE fileHandle;
     WIN32_FIND_DATAA fileData;
 
-    char backupFrom[SELF_BU_PATH_MAX_SIZE];
-    char backupTo[SELF_BU_PATH_MAX_SIZE];
-    char dirBuf[SELF_BU_PATH_MAX_SIZE];
-	/*
-    if(!mode)
-    {
-        GetCurrentDirectory(SELF_BU_PATH_MAX_SIZE, backupFrom); // C:/dir
-        replSymb(backupFrom); // '\' 替换为 '/'
-        strcat(backupFrom, "/");
-    }
-    else if(mode == 1)
-    {
-        GetCurrentDirectoryW(SELF_BU_PATH_MAX_SIZE, backupFrom); // C
-        strcat(backupFrom, ":/");
-    }
-    else
-		*/
+    char backupFrom[SELF_BU_PATH_MAX_SIZE];  // 需要备份的位置
+    char backupTo[SELF_BU_PATH_MAX_SIZE];      // 存储备份的位置
+    char dirBuf[SELF_BU_PATH_MAX_SIZE];           //  临时路径
+
     {
         int len = strlen(path);
         strcpy(backupFrom, path);
@@ -156,8 +145,6 @@ void backup(int mode, const char* path, const char* bupath)
                     continue;
             strcat(tempFileDirBuf, fileData.cFileName);
             strcat(tempBackUpPath, fileData.cFileName);
-           // fprintf(stdout, "Found Direction >>> %s <<<\n", tempFileDirBuf);
-           // fprintf(stdout, "Create Direction >>> %s <<<\n", tempBackUpPath);
              if(_access(tempFileDirBuf, 0) != -1)
                 if(!CreateDirectory(tempBackUpPath, NULL))
                     fprintf(stderr, "ERROR CODE >> %d \n", GetLastError());
@@ -174,8 +161,7 @@ void backup(int mode, const char* path, const char* bupath)
         }
     }while(FindNextFile(fileHandle, &fileData) != 0);
     FindClose(fileHandle);
-
-    //system("Pause");
+    
     return;
 }
 

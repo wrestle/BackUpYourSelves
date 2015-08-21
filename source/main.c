@@ -3,10 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <Windows.h>
-#include <tchar.h>
 
 #include "showFile.h"
-//#include "setPath.h"
 #include "backup.h"
 
 int main(void)
@@ -36,23 +34,22 @@ int main(void)
                select != 3 && select != 4 &&
                select != 5  );
         system("cls");
+
         switch(select)
         {
-            char buf[256];
         case 1 :
-            memset(buf, 0, 256*sizeof(char));
             printf("Back Up Begin! \n");
-            showBUSelect();
+            showBUSelect();    // 开始备份
             printf("Back Up End!   \n");
             break;
         case 2 :
-            getEnterPath();
+            getEnterPath();     // 设置备份存储路径
             break;
         case 3 :
-            showPathHistory();
+            showPathHistory(); // 查看以往的备份存储路径历史
             break;
         case 4 :
-            showReadMe();
+            showReadMe(); 
             break;
         case 5 :
             exit(1);
