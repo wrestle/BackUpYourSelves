@@ -83,7 +83,7 @@ void showAllFileInDir(const char * DirPath, int shownmode)
 /** ReadMe **/
 void showReadMe()
 {
-    printf("The SoftWare is about BackUp System Which Create By \n");
+    printf("The SoftWare is about Back up Files Which Create By \n");
     printf("WushengXin that wanna to Practice himself\n");
     printf("It can help you to BackUp your Files without doubt!\n");
     printf("Green, Free, OpenSource it is\n");
@@ -91,6 +91,10 @@ void showReadMe()
     printf("To Use it: \n");
     printf("No Sale\n");
     printf("AnyThing You Want Because of the Source Code will OPEN\n");
+	printf("\n First The Default path which you would like to store in, is shown on the top\n");
+	printf("If you choose 1. , that you start to begin backup, enter the path which you want to back up\n");
+	printf("wait for it and it will tell you the time cost after the end.\n");
+	printf(" Second You also can change the Default path by choosing 2. \n");
     printf("\n Press Any Key Return To the Main Windows \n");
     system("Pause");
     return;

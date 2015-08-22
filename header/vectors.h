@@ -4,16 +4,14 @@
 **/
 #ifndef VECTORS_H_INCLUDED
 #define VECTORS_H_INCLUDED
-#include <stdio.h>
-#include <setjmp.h>
-#include <stdlib.h>
 #include <string.h>
+#include "saftfunc.h"
 
 typedef struct _vectors vectors;
 typedef struct _combine combine;
 
 typedef int                      (*fpPushBack)(vectors *, const char *, const char*);
-typedef combine * (*fppopfront)(vectors* );
+typedef combine *		  (*fppopfront)(vectors* );
 typedef void                   (*fpDestructor)(vectors* );
 
 struct _vectors{                        //         | 0   | 1  |  2  |  3  |  4  | ... | 19    |
@@ -50,8 +48,5 @@ int newVectors(vectors* objects);
 
 /** 释放 **/
 void delVectors(vectors* objects);
-
-/** 分别用于 newVectors(取消), newVectors's nameArr, pushback's srcpath, pushback's dstpath, pushback's combine **/
-jmp_buf fstJmp, secJmp, trdJmp, fifJmp, sixJmp;
 
 #endif // VECTORS_H_INCLUDED

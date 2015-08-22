@@ -1,11 +1,9 @@
 ﻿#ifndef SETPATH_H_INCLUDED
 #define SETPATH_H_INCLUDED
 
-#include <stdio.h>
 #include <time.h>
 #include <string.h>
-#include <stdlib.h>
-
+#include "saftfunc.h"
 #define SELF_PATH_HISTIRY_MAX_NUM 10
 #define SELF_BU_PATH_MAX_SIZE 2048
 #define SELF_LOAD_DEFAULT_PATH "C:/User-wu/backup/"

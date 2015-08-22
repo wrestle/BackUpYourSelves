@@ -1,7 +1,7 @@
 ﻿#ifndef BACKUP_H_INCLUDED
 #define BACKUP_H_INCLUDED
 
-#include <io.h>
+
 #include <time.h>
 #include <process.h>
 #include <Windows.h>

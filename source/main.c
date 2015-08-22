@@ -1,8 +1,4 @@
-﻿#include <stdio.h>
-#include <memory.h>
-#include <stdlib.h>
-#include <string.h>
-#include <Windows.h>
+﻿#include <memory.h>
 
 #include "showFile.h"
 #include "backup.h"

@@ -1,7 +1,6 @@
 ﻿#include "setPath.h"
 
 static char PathBuf[SELF_BU_PATH_MAX_SIZE] = SELF_LOAD_DEFAULT_PATH; //用于存放备份的路径
-//static char* PathHisBuf[SELF_PATH_HISTIRY_MAX_NUM] = {NULL}
 
 /** 获取和设置备份路径 **/
 void getEnterPath()
@@ -41,12 +40,9 @@ void storePathHistory(const char path[])
     time_t timep;
     time (&timep);
 
-    FILE* input = fopen("PathHistory.txt", "a");
+    FILE* input = Fopen("PathHistory.txt", "a");
     if(!input)
-    {
-        fprintf(stderr, "OPEN OR CREATE \"PathHistory.txt\" Fail!\n");
 		return;
-    }
 
     fprintf(input, "%s %s", path, ctime(&timep));
     fclose(input);
@@ -57,12 +53,10 @@ void showPathHistory()
 {
     char outBufName[SELF_BU_PATH_MAX_SIZE];
 
-    FILE* reading = fopen("PathHistory.txt", "r");
+    FILE* reading = Fopen("PathHistory.txt", "r");
 	if (!reading)
-	{
-		fprintf(stderr, "OPEN \"PathHistory.txt\" Fail!");
 		return;
-	}
+
 	for(int i = 1;i <= 10 && (!feof(reading));++i)
     {
         fgets(outBufName, SELF_BU_PATH_MAX_SIZE*sizeof(char), reading);
@@ -85,7 +79,7 @@ void replSymb(char * source)
 	size_t len = strlen(source), i;
 	for (i = 0; i <= len; ++i)
 	{
-		if (source[i] == '\\')
+		if (source[i] == '\\') // 两个饭斜杆是因为C语言中转义符号的需要。
 			source[i] = '/';
 	}
 	return;
