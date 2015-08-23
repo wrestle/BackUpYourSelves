@@ -1,6 +1,9 @@
 ﻿#include "backup.h"
 <<<<<<< HEAD
+<<<<<<< HEAD
 #define SELF_THREADS_LIMIT 5
+=======
+>>>>>>> parent of 8bcf7a4... Update
 =======
 >>>>>>> parent of 8bcf7a4... Update
 

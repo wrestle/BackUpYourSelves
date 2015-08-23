@@ -7,6 +7,9 @@
 #include <string.h>
 #include <Windows.h>
 #include <tchar.h>
+<<<<<<< HEAD
+>>>>>>> parent of 8bcf7a4... Update
+=======
 >>>>>>> parent of 8bcf7a4... Update
 
 #include "showFile.h"
