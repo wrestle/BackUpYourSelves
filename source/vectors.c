@@ -10,13 +10,13 @@ int newVectors(vectors* objects)
     //localArr = (combine**)malloc(20*sizeof(combine*));
 	localArr = (combine**)Malloc(20 * sizeof(combine*));
     if(!localArr)
-    //{
+    {
     //    fprintf(stderr, "Allocate Memory For \"vectors->nameArray\" Fail! \n ");
     //    if(times++ < 2)
 	//		longjmp(secJmp, 1);//  second jump from here
     //    else
             return 2;
-    // }
+     }
 	 
     localvec->capcity  = 20; // 容量
     localvec->rear = 0;    // 队尾
@@ -33,7 +33,7 @@ int newVectors(vectors* objects)
 void delVectors(vectors* objects)
 {
     combine**   localArr   = objects->nameArray;
-    Free(localArr);
+    free(localArr);
     return;
 }
 
@@ -52,26 +52,26 @@ int pushback(vectors* objects, const char* src, const char* dst)
     //localSrc = (char*)malloc(len_src + 1);
 	localSrc = (char*)Malloc(len_src + 1);
 	if (!localSrc)
-	//{
+	{
 	//	fprintf(stderr, "Allocate Memory For \"localSrc in pushback\" Fail! \n ");
 	//	if (times++ < 2)
 	//		longjmp(trdJmp, 1); /** third jump from there **/
 	//	else
-			return -1;
-	//}
+			return -3;
+	}
 
 	//times = 0;
 	//setjmp(fifJmp);
 	//localDst = (char*)malloc(len_dst + 1);
-	//localDst = (char*)Malloc(len_dst + 1);
+	localDst = (char*)Malloc(len_dst + 1);
 	if (!localDst)
-	//{
+	{
 	//	fprintf(stderr, "Allocate Memory For \"localDst in pushback\" Fail! \n ");
 	//	if (times++ < 2)
 	//		longjmp(fifJmp, 1); /** fifth jump from there **/
 	//	else
-			return -1;
-	//}
+			return -4;
+	}
     strcpy(localSrc, src);
 	strcpy(localDst, dst);
 
@@ -80,13 +80,13 @@ int pushback(vectors* objects, const char* src, const char* dst)
 	//localCom = (combine*)malloc(sizeof(combine));
 	localCom = (combine*)Malloc(sizeof(combine));
 	if (!localCom)
-	//{
+	{
 	//	fprintf(stderr, "Allocate Memory For \"localCom in pushback\" Fail! \n ");
 	//	if (times++ < 2)
 	//		longjmp(sixJmp, 1); /** sixth jump from there **/
 	//	else
-			return -1;
-	//}
+			return -5;
+	}
 	localCom->dstPath = localDst;
 	localCom->srcPath = localSrc;
 

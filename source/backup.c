@@ -1,16 +1,11 @@
 ﻿#include "backup.h"
-<<<<<<< HEAD
-<<<<<<< HEAD
 #define SELF_THREADS_LIMIT 5
-=======
->>>>>>> parent of 8bcf7a4... Update
-=======
->>>>>>> parent of 8bcf7a4... Update
 
 vectors filesVec;
 HANDLE vecEmpty, vecFull; //两个 Semaphore
 HANDLE pushThread;  // 将路径加入队列中的线程
 CRITICAL_SECTION inputSec, testSec;
+HANDLE popMutex;
 
 // 计算时间
 clock_t start, finish;
@@ -20,12 +15,13 @@ void showBUSelect()
 {
     char tmpBuf[256];
     int selects;
-	HANDLE copyThread[3]; //复制文件的线程
+	HANDLE copyThread[SELF_THREADS_LIMIT]; //复制文件的线程
 
 	InitializeCriticalSection(&inputSec);
 	InitializeCriticalSection(&testSec);
 	vecEmpty = CreateSemaphore(NULL, 20, 20, NULL);
 	vecFull = CreateSemaphore(NULL, 0, 20, NULL);
+	//popMutex = CreateMutex(NULL, FALSE, NULL);
 
     do{
         system("cls");
@@ -53,6 +49,7 @@ void showBUSelect()
 		
         switch(selects)
         {
+			//int case_three;
         case 1: // 取消 case 1  和 case 2 的选项功能，因为实际上没有用处
 			/*
 			pushThread = (HANDLE)_beginthreadex(NULL, 0, callBackup, &selects, 0, NULL);
@@ -76,13 +73,14 @@ void showBUSelect()
             break;
 			*/
         case 3 :
+			//case_three = selects;
 			pushThread = (HANDLE)_beginthreadex(NULL, 0, callBackup, &selects, 0, NULL);
-			for (int i = 0; i < 3; ++i)
+			for (int i = 0; i < SELF_THREADS_LIMIT; ++i)
 			{
 				copyThread[i] = (HANDLE)_beginthreadex(NULL, 0, callCopyFile, NULL, 0, NULL);
 			}
 			WaitForSingleObject(pushThread, INFINITE);
-			WaitForMultipleObjects(3, copyThread, TRUE, INFINITE);
+			WaitForMultipleObjects(SELF_THREADS_LIMIT, copyThread, TRUE, INFINITE);
 			printf("All Thread Exit!\n");
             break;
         case 4 :
@@ -96,7 +94,7 @@ void showBUSelect()
 		
 		// 销毁线程使用过的句柄
 		CloseHandle(pushThread);
-		for (int i = 0; i < 10; ++i)
+		for (int i = 0; i < SELF_THREADS_LIMIT; ++i)
 			CloseHandle(copyThread[i]);
 		//释放 filesVec
 		filesVec.Delete(&filesVec);
@@ -110,32 +108,18 @@ void backup(int mode, const char* path, const char* bupath)
     //操作文件参数
     HANDLE fileHandle;
     WIN32_FIND_DATAA fileData;
+	int len = strlen(path);
 
-    char backupFrom[SELF_BU_PATH_MAX_SIZE];
-    char backupTo[SELF_BU_PATH_MAX_SIZE];
-    char dirBuf[SELF_BU_PATH_MAX_SIZE];
-	/*
-    if(!mode)
-    {
-        GetCurrentDirectory(SELF_BU_PATH_MAX_SIZE, backupFrom); // C:/dir
-        replSymb(backupFrom); // '\' 替换为 '/'
-        strcat(backupFrom, "/");
-    }
-    else if(mode == 1)
-    {
-        GetCurrentDirectoryW(SELF_BU_PATH_MAX_SIZE, backupFrom); // C
-        strcat(backupFrom, ":/");
-    }
-    else
-		*/
-    {
-        int len = strlen(path);
-        strcpy(backupFrom, path);
-        if(len == 1)
-            strcat(backupFrom, ":/"); // C
-        else if(backupFrom[len-1] != '/')
-            strcat(backupFrom, "/");  // C:/dir/subdir
-    }
+    char backupFrom[SELF_BU_PATH_MAX_SIZE];  // 需要备份的位置
+    char backupTo[SELF_BU_PATH_MAX_SIZE];      // 存储备份的位置
+    char dirBuf[SELF_BU_PATH_MAX_SIZE];           //  临时路径
+   
+     strcpy(backupFrom, path);
+     if(len == 1)
+         strcat(backupFrom, ":/"); // C
+     else if(backupFrom[len-1] != '/')
+         strcat(backupFrom, "/");  // C:/dir/subdir
+
     strcpy(dirBuf, backupFrom);
     strcat(dirBuf, "/*");
     strcpy(backupTo, bupath);
@@ -163,8 +147,6 @@ void backup(int mode, const char* path, const char* bupath)
                     continue;
             strcat(tempFileDirBuf, fileData.cFileName);
             strcat(tempBackUpPath, fileData.cFileName);
-           // fprintf(stdout, "Found Direction >>> %s <<<\n", tempFileDirBuf);
-           // fprintf(stdout, "Create Direction >>> %s <<<\n", tempBackUpPath);
              if(_access(tempFileDirBuf, 0) != -1)
                 if(!CreateDirectory(tempBackUpPath, NULL))
                     fprintf(stderr, "ERROR CODE >> %d \n", GetLastError());
@@ -177,12 +159,12 @@ void backup(int mode, const char* path, const char* bupath)
 
 			WaitForSingleObject(vecEmpty, INFINITE);
 			filesVec.PushBack(&filesVec, tempFileDirBuf, tempBackUpPath);
+			
 			ReleaseSemaphore(vecFull, 1, NULL);
         }
     }while(FindNextFile(fileHandle, &fileData) != 0);
     FindClose(fileHandle);
-
-    //system("Pause");
+    
     return;
 }
 
@@ -222,17 +204,19 @@ unsigned int __stdcall callCopyFile(void * para)
 		LeaveCriticalSection(&testSec);
 		if (isExit != STILL_ACTIVE && empty)
 		{
-			//puts("Push Thread is End!\n");
+			puts("Push Thread is End!\n");
 			break;
 		}
 		
-		isExit = WaitForSingleObject(vecFull, 30000);
+		isExit = WaitForSingleObject(vecFull, 3000);
 		if (isExit == WAIT_TIMEOUT)
 			break;
 
 		EnterCriticalSection(&inputSec); // 这个关键段的添加十分重要，是读取时候的核心
+		//WaitForSingleObject(popMutex, INFINITE);
 		if(!(localCom = filesVec.PopFront(address)))
 			continue;
+		//ReleaseMutex(popMutex);
 		LeaveCriticalSection(&inputSec);
 		
 		if (!CopyFile(localCom->srcPath, localCom->dstPath, FALSE))
@@ -241,9 +225,9 @@ unsigned int __stdcall callCopyFile(void * para)
 			fprintf(stderr, "<<<<<Error Code>>>>>>%d \n", GetLastError());
 			LeaveCriticalSection(&inputSec);
 		}
-		free(localCom->srcPath);
-		free(localCom->dstPath);
-		free(localCom);
+		Free(localCom->srcPath);
+		Free(localCom->dstPath);
+		Free(localCom);
 		ReleaseSemaphore(vecEmpty, 1, NULL);
 	}
 	return 0;

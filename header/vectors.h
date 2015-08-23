@@ -4,6 +4,7 @@
 **/
 #ifndef VECTORS_H_INCLUDED
 #define VECTORS_H_INCLUDED
+
 #include <string.h>
 #include "saftfunc.h"
 
@@ -32,9 +33,7 @@ struct _combine
 };
 
 /** 压入
-**  向向量末尾中添加一个元素，并且返回坐标 , -1 为内存分配失败
-**  -2 为扩大vectors容量失败  -3 为到达扩容上限，不再允许扩容
-**  在函数中分配内存来添加元素
+**  向向量末尾中添加一个元素，并且返回坐标 
 **/
 int pushback(vectors * objects, const char * , const char *);
 

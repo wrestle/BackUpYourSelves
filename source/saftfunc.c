@@ -13,6 +13,7 @@ void* Malloc(size_t sizes)
 		else
 		{
 			fprintf(stderr, "The malloc allocate %zu bytes Fail!\n", sizes);
+			exit(-1);
 			return localpoint;
 		}
 	}
@@ -24,6 +25,7 @@ void Free(void* pointer)
 	if (!pointer) 
 		return;
 	free(pointer);
+	pointer = NULL;
 	return;
 }
 
