@@ -1,6 +1,16 @@
+<<<<<<< HEAD
 ﻿#include <memory.h>
+=======
+﻿#include <stdio.h>
+#include <memory.h>
+#include <stdlib.h>
+#include <string.h>
+#include <Windows.h>
+#include <tchar.h>
+>>>>>>> parent of 8bcf7a4... Update
 
 #include "showFile.h"
+//#include "setPath.h"
 #include "backup.h"
 
 int main(void)
@@ -30,22 +40,23 @@ int main(void)
                select != 3 && select != 4 &&
                select != 5  );
         system("cls");
-
         switch(select)
         {
+            char buf[256];
         case 1 :
+            memset(buf, 0, 256*sizeof(char));
             printf("Back Up Begin! \n");
-            showBUSelect();    // 开始备份
+            showBUSelect();
             printf("Back Up End!   \n");
             break;
         case 2 :
-            getEnterPath();     // 设置备份存储路径
+            getEnterPath();
             break;
         case 3 :
-            showPathHistory(); // 查看以往的备份存储路径历史
+            showPathHistory();
             break;
         case 4 :
-            showReadMe(); 
+            showReadMe();
             break;
         case 5 :
             exit(1);
