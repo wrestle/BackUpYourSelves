@@ -8,6 +8,7 @@
 #include <string.h>
 #include "saftfunc.h"
 
+
 typedef struct _vectors vectors;
 typedef struct _combine combine;
 

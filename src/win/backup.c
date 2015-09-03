@@ -129,9 +129,12 @@ void backup(int mode, const char* path, const char* bupath)
     fileHandle = FindFirstFile(dirBuf, &fileData);
     if( fileHandle == INVALID_HANDLE_VALUE)
     {
-        fprintf(stdout, "The Handle getting Failure!\n"
+#if !defined(NOT_DEBUG)
+     
+		fprintf(stderr, "The Handle getting Failure!\n"
                             "  AT %s in %d lines\n", __FILE__, __LINE__);
         system("Pause");
+#endif
         return;
     }
  
@@ -147,25 +150,47 @@ void backup(int mode, const char* path, const char* bupath)
                     continue;
             strcat(tempFileDirBuf, fileData.cFileName);
             strcat(tempBackUpPath, fileData.cFileName);
-             if(_access(tempFileDirBuf, 0) != -1)
-                if(!CreateDirectory(tempBackUpPath, NULL))
-                    fprintf(stderr, "ERROR CODE >> %d \n", GetLastError());
+
+			if (_access(tempFileDirBuf, 0) != -1)
+#if !defined(NOT_DEBUG)
+				if (!CreateDirectory(tempBackUpPath, NULL))
+					fprintf(stderr, "ERROR CODE >> %d \n", GetLastError());
+#else
+				CreateDirectory(tempBackUpPath, NULL);
+#endif
             backup(2, tempFileDirBuf, tempBackUpPath);
         }
         else
         {
             strcat(tempFileDirBuf, fileData.cFileName);
             strcat(tempBackUpPath, fileData.cFileName);
-
+			if (_access(tempBackUpPath, 0) == 0) /*如果目标文件存在*/
+			{
+				if (is_changed(tempBackUpPath, tempFileDirBuf))
+				{
+#if !defined(NOT_DEBUG)
+					fprintf(stderr, "File : %s hasn't changed!\n", tempFileDirBuf);
+#endif
+					continue;  /*如果目标文件与源文件的修改时间相同，则不需要入队列*/
+				}
+			}
 			WaitForSingleObject(vecEmpty, INFINITE);
+
 			filesVec.PushBack(&filesVec, tempFileDirBuf, tempBackUpPath);
-			
 			ReleaseSemaphore(vecFull, 1, NULL);
         }
     }while(FindNextFile(fileHandle, &fileData) != 0);
     FindClose(fileHandle);
     
     return;
+}
+
+int is_changed(const char * dstfile, const char * srcfile)
+{
+	struct stat dst_stat, src_stat;
+	stat(dstfile, &dst_stat);
+	stat(srcfile, &src_stat);
+	return dst_stat.st_mtime == src_stat.st_mtime;
 }
 
 unsigned int __stdcall callBackup(void * pSelect)
@@ -198,6 +223,8 @@ unsigned int __stdcall callCopyFile(void * para)
 	int empty;
 	while (1)
 	{
+		char * dst_path = NULL;
+		char * src_path = NULL;
 		EnterCriticalSection(&testSec);
 		GetExitCodeThread(pushThread, &isExit);
 		empty = address->emptys;
@@ -208,7 +235,7 @@ unsigned int __stdcall callCopyFile(void * para)
 			break;
 		}
 		
-		isExit = WaitForSingleObject(vecFull, 3000);
+		isExit = WaitForSingleObject(vecFull, 30000);
 		if (isExit == WAIT_TIMEOUT)
 			break;
 
@@ -218,15 +245,22 @@ unsigned int __stdcall callCopyFile(void * para)
 			continue;
 		//ReleaseMutex(popMutex);
 		LeaveCriticalSection(&inputSec);
-		
-		if (!CopyFile(localCom->srcPath, localCom->dstPath, FALSE))
+
+		dst_path = localCom->dstPath;
+		src_path = localCom->srcPath;
+
+#if !defined(NOT_DEBUG)
+		if (CopyFile(src_path, dst_path, FALSE) == 0)
 		{
 			EnterCriticalSection(&inputSec);
 			fprintf(stderr, "<<<<<Error Code>>>>>>%d \n", GetLastError());
 			LeaveCriticalSection(&inputSec);
 		}
-		Free(localCom->srcPath);
-		Free(localCom->dstPath);
+#else
+			CopyFile(src_path, dst_path, FALSE);
+#endif
+		Free(src_path);
+		Free(dst_path);
 		Free(localCom);
 		ReleaseSemaphore(vecEmpty, 1, NULL);
 	}
