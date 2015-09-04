@@ -7,7 +7,7 @@
 
 #include <string.h>
 #include "saftfunc.h"
-
+#include <Windows.h>
 
 typedef struct _vectors vectors;
 typedef struct _combine combine;

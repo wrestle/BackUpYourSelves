@@ -4,7 +4,6 @@
 
 #include <time.h>
 #include <process.h>
-#include <Windows.h>
 #include <sys/stat.h>
 
 #include "setPath.h"

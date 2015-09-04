@@ -1,4 +1,5 @@
 ﻿#include "vectors.h"
+CRITICAL_SECTION empty_sec;
 
 int newVectors(vectors* objects)
 {
@@ -27,6 +28,8 @@ int newVectors(vectors* objects)
     localvec->PushBack = pushback;
     localvec->PopFront = popfront;
     localvec->Delete      = delVectors;
+
+	InitializeCriticalSection(&empty_sec);
     return 0;
 }
 
@@ -34,6 +37,8 @@ void delVectors(vectors* objects)
 {
     combine**   localArr   = objects->nameArray;
     free(localArr);
+
+	DeleteCriticalSection(&empty_sec);
     return;
 }
 
@@ -105,10 +110,13 @@ combine* popfront(vectors* objects)
 	combine* localCom = objects->nameArray[localfront];
 	objects->nameArray[localfront] = NULL;
 	objects->fronts = ((objects->fronts) + 1) % 20;
+
+	EnterCriticalSection(&empty_sec);
 	if (objects->fronts == objects->rear)
 		objects->emptys = 1;
 	else
 		objects->emptys = 0;
+	LeaveCriticalSection(&empty_sec);
 	return localCom;
 }
 

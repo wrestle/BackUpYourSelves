@@ -1,13 +1,13 @@
 ﻿#include "backup.h"
-#define SELF_THREADS_LIMIT 5
+#define SELF_THREADS_LIMIT 4
 
 vectors filesVec;
 HANDLE vecEmpty, vecFull; //两个 Semaphore
 HANDLE pushThread;  // 将路径加入队列中的线程
 CRITICAL_SECTION inputSec, testSec;
-HANDLE popMutex;
+//HANDLE popMutex;
 
-// 计算时间
+/* 计算时间 */ 
 clock_t start, finish;
 double Total_time;
 
@@ -17,13 +17,14 @@ void showBUSelect()
     int selects;
 	HANDLE copyThread[SELF_THREADS_LIMIT]; //复制文件的线程
 
-	InitializeCriticalSection(&inputSec);
-	InitializeCriticalSection(&testSec);
-	vecEmpty = CreateSemaphore(NULL, 20, 20, NULL);
-	vecFull = CreateSemaphore(NULL, 0, 20, NULL);
 	//popMutex = CreateMutex(NULL, FALSE, NULL);
 
     do{
+		InitializeCriticalSection(&inputSec);
+		InitializeCriticalSection(&testSec);
+		vecEmpty = CreateSemaphore(NULL, 20, 20, NULL);
+		vecFull = CreateSemaphore(NULL, 0, 20, NULL);
+
         system("cls");
         fprintf(stdout, "-------------------1. Back Up------------------ \n");
         fprintf(stdout, " For This Select, You can choose Three Options: \n");
@@ -87,12 +88,20 @@ void showBUSelect()
             return;
         }
 
-		// 计算时间
+		/* 计算时间 */
 		finish = clock();
 		Total_time = (double)(finish - start) / CLOCKS_PER_SEC;
 		printf("Time cost is %f s\n", Total_time);
-		
-		// 销毁线程使用过的句柄
+
+		/* 销毁使用的 CS */
+		DeleteCriticalSection(&inputSec);
+		DeleteCriticalSection(&testSec);
+
+		/* 销毁信号量 */
+		CloseHandle(vecEmpty);
+		CloseHandle(vecFull);
+
+		/* 销毁线程使用过的句柄 */ 
 		CloseHandle(pushThread);
 		for (int i = 0; i < SELF_THREADS_LIMIT; ++i)
 			CloseHandle(copyThread[i]);
@@ -154,7 +163,7 @@ void backup(int mode, const char* path, const char* bupath)
 			if (_access(tempFileDirBuf, 0) != -1)
 #if !defined(NOT_DEBUG)
 				if (!CreateDirectory(tempBackUpPath, NULL))
-					fprintf(stderr, "ERROR CODE >> %d \n", GetLastError());
+					fprintf(stderr, "Create Directory ERROR CODE >> %d \n", GetLastError());
 #else
 				CreateDirectory(tempBackUpPath, NULL);
 #endif
@@ -195,10 +204,6 @@ int is_changed(const char * dstfile, const char * srcfile)
 
 unsigned int __stdcall callBackup(void * pSelect)
 {
-	int Select = *(int *)pSelect;
-
-	if (Select == 3)
-	{
 		char tmpBuf[SELF_BU_PATH_MAX_SIZE], tmpPath[SELF_BU_PATH_MAX_SIZE];
 
 		fprintf(stdout, " Enter the Full Path You want to BackUp\n");
@@ -206,11 +211,6 @@ unsigned int __stdcall callBackup(void * pSelect)
 		sscanf(tmpBuf, "%s", tmpPath);
 		start = clock();
 		backup(2, tmpPath, getBackUpPath());
-	}
-	else
-	{
-		backup(Select, NULL, getBackUpPath());
-	}
 
 	return 0;
 }
