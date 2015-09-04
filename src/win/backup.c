@@ -18,7 +18,6 @@ void showBUSelect()
 	HANDLE copyThread[SELF_THREADS_LIMIT]; //复制文件的线程
 
 	//popMutex = CreateMutex(NULL, FALSE, NULL);
-
     do{
 		InitializeCriticalSection(&inputSec);
 		InitializeCriticalSection(&testSec);
@@ -33,14 +32,14 @@ void showBUSelect()
         fprintf(stdout, " 3. Mode 2 (The Directory Path That You Enter) \n");
         fprintf(stdout, " 4. Back To last level \n");
         fprintf(stdout, "----------------------------------------------- \n");
-        fprintf(stdout, "Enter Your Selection: ");
-        setjmp(forJmp);
+		setjmp(forJmp);
+		fprintf(stdout, "Enter Your Selection: ");
         fgets(tmpBuf, 256, stdin);
         sscanf(tmpBuf, "%d", &selects);
         if(selects != 1 && selects != 2 &&
                 selects != 3 && selects != 4)
         {
-            fprintf(stdout, "\n Your Select \" %s \" is Invalid!\n Try Again: ", tmpBuf);
+            fprintf(stdout, "\n Your Select \" %s \" is Invalid!\n Try Again \n", tmpBuf);
             longjmp(forJmp, 1);
         }
 
@@ -50,32 +49,28 @@ void showBUSelect()
 		
         switch(selects)
         {
-			//int case_three;
+			jmp_buf get_enter;
         case 1: // 取消 case 1  和 case 2 的选项功能，因为实际上没有用处
-			/*
-			pushThread = (HANDLE)_beginthreadex(NULL, 0, callBackup, &selects, 0, NULL);
-			for (int i = 0; i < 10; ++i)
+
+		case 2 :
+
+		case 3:
+		{
+			char tmpBuf[SELF_BU_PATH_MAX_SIZE], tmpPath[SELF_BU_PATH_MAX_SIZE];
+			setjmp(get_enter);
+			fprintf(stdout, " Enter the Full Path You want to BackUp(e.g: C:/Programing)\n");
+			fprintf(stdout, " Or Enter q to back to select\nYour Enter : ");
+			fgets(tmpBuf, SELF_BU_PATH_MAX_SIZE, stdin);
+			sscanf(tmpBuf, "%s", tmpPath);
+			if (_access(tmpPath, 0) != 0)
 			{
-				copyThread[i] = (HANDLE)_beginthreadex(NULL, 0, callCopyFile, NULL, 0, NULL);
+				if (tmpPath[0] == 'q')
+					longjmp(forJmp, 0);
+				fprintf(stderr, "The Path You Enter is Not Exit! \n Try Again : ");
+				longjmp(get_enter, 0);
 			}
-			WaitForSingleObject(pushThread, INFINITE);
-			WaitForMultipleObjects(20, copyThread, TRUE, INFINITE);
-            break;
-			*/
-        case 2 :
-			/*
-			pushThread = (HANDLE)_beginthreadex(NULL, 0, callBackup, &selects, 0, NULL);
-			for (int i = 0; i < 10; ++i)
-			{
-				copyThread[i] = (HANDLE)_beginthreadex(NULL, 0, callCopyFile, NULL, 0, NULL);
-			}
-			WaitForSingleObject(pushThread, INFINITE);
-			WaitForMultipleObjects(20, copyThread, TRUE, INFINITE);
-            break;
-			*/
-        case 3 :
-			//case_three = selects;
-			pushThread = (HANDLE)_beginthreadex(NULL, 0, callBackup, &selects, 0, NULL);
+			
+			pushThread = (HANDLE)_beginthreadex(NULL, 0, callBackup, (void*)tmpPath, 0, NULL);
 			for (int i = 0; i < SELF_THREADS_LIMIT; ++i)
 			{
 				copyThread[i] = (HANDLE)_beginthreadex(NULL, 0, callCopyFile, NULL, 0, NULL);
@@ -83,7 +78,8 @@ void showBUSelect()
 			WaitForSingleObject(pushThread, INFINITE);
 			WaitForMultipleObjects(SELF_THREADS_LIMIT, copyThread, TRUE, INFINITE);
 			printf("All Thread Exit!\n");
-            break;
+		}
+			break;
         case 4 :
             return;
         }
@@ -153,36 +149,32 @@ void backup(int mode, const char* path, const char* bupath)
         strcpy(tempBackUpPath, backupTo);
         strcpy(tempFileDirBuf, backupFrom); //拷贝一份无 '/*' 结尾的路径用于补齐完整路径
         if(fileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-        {
+		{/* 如果是一个文件夹 */
             if(strcmp(fileData.cFileName, ".") == 0 ||
                strcmp(fileData.cFileName, "..") == 0)
                     continue;
-            strcat(tempFileDirBuf, fileData.cFileName);
+			strcat(tempFileDirBuf, fileData.cFileName); 
             strcat(tempBackUpPath, fileData.cFileName);
 
-			if (_access(tempFileDirBuf, 0) != -1)
-#if !defined(NOT_DEBUG)
-				if (!CreateDirectory(tempBackUpPath, NULL))
-					fprintf(stderr, "Create Directory ERROR CODE >> %d \n", GetLastError());
-#else
+			if (_access(tempFileDirBuf, 0) != -1)      /* 如果目录不存在 */
 				CreateDirectory(tempBackUpPath, NULL);
-#endif
-            backup(2, tempFileDirBuf, tempBackUpPath);
+
+			backup(2, tempFileDirBuf, tempBackUpPath); /* 递归创建其所有子目录 */
         }
         else
-        {
+		{/* 如果是一个文件 */
             strcat(tempFileDirBuf, fileData.cFileName);
             strcat(tempBackUpPath, fileData.cFileName);
 			if (_access(tempBackUpPath, 0) == 0) /*如果目标文件存在*/
 			{
 				if (is_changed(tempBackUpPath, tempFileDirBuf))
-				{
-#if !defined(NOT_DEBUG)
-					fprintf(stderr, "File : %s hasn't changed!\n", tempFileDirBuf);
-#endif
 					continue;  /*如果目标文件与源文件的修改时间相同，则不需要入队列*/
-				}
+
+				fprintf(stderr, "File : %s hast changed!\n", tempFileDirBuf);
 			}
+			else
+				fprintf(stderr, "Add New File %s \n", tempFileDirBuf);
+
 			WaitForSingleObject(vecEmpty, INFINITE);
 
 			filesVec.PushBack(&filesVec, tempFileDirBuf, tempBackUpPath);
@@ -204,14 +196,10 @@ int is_changed(const char * dstfile, const char * srcfile)
 
 unsigned int __stdcall callBackup(void * pSelect)
 {
-		char tmpBuf[SELF_BU_PATH_MAX_SIZE], tmpPath[SELF_BU_PATH_MAX_SIZE];
+	char* tmpPath = (char*)pSelect;
 
-		fprintf(stdout, " Enter the Full Path You want to BackUp\n");
-		fgets(tmpBuf, 256, stdin);
-		sscanf(tmpBuf, "%s", tmpPath);
-		start = clock();
-		backup(2, tmpPath, getBackUpPath());
-
+	start = clock();
+	backup(2, tmpPath, getBackUpPath());
 	return 0;
 }
 
@@ -231,13 +219,20 @@ unsigned int __stdcall callCopyFile(void * para)
 		LeaveCriticalSection(&testSec);
 		if (isExit != STILL_ACTIVE && empty)
 		{
+#if !defined(NOT_DEBUG)
 			puts("Push Thread is End!\n");
+#endif
 			break;
 		}
 		
 		isExit = WaitForSingleObject(vecFull, 30000);
 		if (isExit == WAIT_TIMEOUT)
+		{
+#if !defined(NOT_DEBUG)
+			fprintf(stderr, "Copy Thread wait time out!\n");
+#endif
 			break;
+		}
 
 		EnterCriticalSection(&inputSec); // 这个关键段的添加十分重要，是读取时候的核心
 		//WaitForSingleObject(popMutex, INFINITE);
@@ -249,16 +244,21 @@ unsigned int __stdcall callCopyFile(void * para)
 		dst_path = localCom->dstPath;
 		src_path = localCom->srcPath;
 
-#if !defined(NOT_DEBUG)
 		if (CopyFile(src_path, dst_path, FALSE) == 0)
 		{
 			EnterCriticalSection(&inputSec);
-			fprintf(stderr, "<<<<<Error Code>>>>>>%d \n", GetLastError());
+			if (ERROR_ACCESS_DENIED == GetLastError())
+			{
+				fprintf(stderr, "\nThe File has already existed and is HIDDEN or ReadOnly! \n");
+				fprintf(stderr, "Copy File from %s Fail!\n", src_path);
+			}
+			else if (ERROR_ENCRYPTION_FAILED == GetLastError())
+			{
+				fprintf(stderr, "\nThe File is Encrypted(被加密), And Can't not be copy\n");
+				fprintf(stderr, "Copy File from %s Fail!\n", src_path);
+			}
 			LeaveCriticalSection(&inputSec);
 		}
-#else
-			CopyFile(src_path, dst_path, FALSE);
-#endif
 		Free(src_path);
 		Free(dst_path);
 		Free(localCom);
