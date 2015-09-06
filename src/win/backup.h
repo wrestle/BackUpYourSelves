@@ -26,8 +26,7 @@ extern "C" {
 	*/
 	void backup(int mode, const char* path, const char* bupath);
 
-	/** 该备份文件是否做过修改 **/
-	/**
+	/** 该备份文件是否做过修改
 	* 增量备份的实现
 	*/
 	static int is_changed(const char * dstfile, const char * srcfile);
@@ -41,6 +40,7 @@ extern "C" {
 	* 用于子线程调用，将备份文件拷贝到备份路径
 	*/
 	static unsigned int __stdcall callCopyFile(void* para);
+
 #if defined(__cplusplus)
 }
 #endif

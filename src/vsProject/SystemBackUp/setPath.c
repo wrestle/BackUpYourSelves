@@ -2,14 +2,34 @@
 
 static char PathBuf[SELF_BU_PATH_MAX_SIZE] = SELF_LOAD_DEFAULT_PATH; //用于存放备份的路径
 
-/** 获取和设置备份路径 **/
+void initPath()
+{
+	int len = 0;
+	char last_path[SELF_BU_PATH_MAX_SIZE] = {0};
+	FILE* hist_file = Fopen("LastPath.conf", "r");
+	if (!hist_file) /* 打开失败则不初始化 */
+		return;
+	fgets(last_path, SELF_BU_PATH_MAX_SIZE, hist_file);
+	len = strlen(last_path);
+	if (len > 1)
+	{
+		last_path[len - 1] = '\0'; /* 消除一个多余的 ‘\n’ */
+		strcpy(PathBuf, last_path);
+	}
+	return;
+}
+
+/** 
+* 获取和设置备份路径 
+*/
 void getEnterPath()
 {
     int intJudge = 0;
     char tmpBuf[SELF_BU_PATH_MAX_SIZE]; /**临时缓冲区**/
-    printf("Enter The Path You want!\n");
+
     while(1)
     {
+		printf("Enter The Path You want!\n");
         fgets(tmpBuf, SELF_BU_PATH_MAX_SIZE*sizeof(char), stdin);
         if(strlen(tmpBuf) <= 1)
         {
@@ -34,21 +54,28 @@ void getEnterPath()
     return;
 }
 
-/** 存储时格式为：路径 时间 **/
+/** 
+* 供使用的存储时格式为：路径
+* 供查看的存储时格式为：路径 时间 
+*/
 void storePathHistory(const char path[])
 {
-    time_t timep;
-    time (&timep);
-
-    FILE* input = Fopen("PathHistory.txt", "a");
-    if(!input)
+	time_t ctimes;
+	time(&ctimes);
+	FILE* input_use = Fopen("LastPath.conf", "w"); /* 每次写入覆盖 */
+    FILE* input_show = Fopen("PathHistory.txt", "a");
+    if(!input_show || !input_use)
 		return;
-
-    fprintf(input, "%s %s", path, ctime(&timep));
-    fclose(input);
+	fprintf(input_use, "%s\n", path);
+    fprintf(input_show, "%s %s", path, ctime(&ctimes));
+    fclose(input_show);
+	fclose(input_use);
     return;
 }
 
+/**
+* 显示路径历史
+*/
 void showPathHistory()
 {
     char outBufName[SELF_BU_PATH_MAX_SIZE];
@@ -68,7 +95,9 @@ void showPathHistory()
     return;
 }
 
-/** 返回当前备份存储路径 **/
+/** 
+* 返回当前备份存储路径 
+*/
 const char * getBackUpPath()
 {
     return PathBuf;

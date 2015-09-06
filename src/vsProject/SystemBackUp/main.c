@@ -9,7 +9,8 @@ int main(void)
     for(;;)
     {
         system("cls");
-        do{
+		initPath(); /* 初始化路径 */
+		do{
         printf("-------------------------------------------------\n");
         printf("The Default Path is : %s\n", SELF_LOAD_DEFAULT_PATH);
         printf("Now The Path is     : %s\n", getBackUpPath());
