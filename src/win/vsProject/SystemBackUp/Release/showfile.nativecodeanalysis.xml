@@ -1,0 +1,2 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<DEFECTS><DEFECT><SFA><FILEPATH>c:\user-wu\program-hdd\vsproject\systembackup\systembackup\</FILEPATH><FILENAME>showfile.c</FILENAME><LINE>75</LINE><COLUMN>21</COLUMN></SFA><DEFECTCODE>6328</DEFECTCODE><DESCRIPTION>大小不匹配:  已将“__int64”作为 _Param_(4) 传递，但需要使用“int”来调用“fprintf”。</DESCRIPTION><FUNCTION>showAllFileInDir</FUNCTION><DECORATED>showAllFileInDir</DECORATED><FUNCLINE>6</FUNCLINE><PATH/></DEFECT></DEFECTS>

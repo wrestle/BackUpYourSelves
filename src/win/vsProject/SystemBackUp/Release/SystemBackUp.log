@@ -1,0 +1,23 @@
+﻿  backup.c
+  main.c
+  saftfunc.c
+  setPath.c
+  showFile.c
+  vectors.c
+  正在运行 C/C++ 代码分析...
+  正在生成代码
+  已完成代码的生成
+  SystemBackUp.vcxproj -> C:\User-wu\Program-HDD\VSProject\SystemBackUp\Release\SystemBackUp.exe
+c:\user-wu\program-hdd\vsproject\systembackup\systembackup\backup.c(38): warning C6031: 返回值被忽略: “sscanf”。
+c:\user-wu\program-hdd\vsproject\systembackup\systembackup\backup.c(64): warning C6031: 返回值被忽略: “sscanf”。
+c:\user-wu\program-hdd\vsproject\systembackup\systembackup\backup.c(97): warning C6387: “vecEmpty”可能是“0”:    这不符合函数“CloseHandle”的规范。
+c:\user-wu\program-hdd\vsproject\systembackup\systembackup\backup.c(65): warning C6054: 可能没有为字符串“tmpPath”添加字符串零终止符。
+c:\user-wu\program-hdd\vsproject\systembackup\systembackup\backup.c(98): warning C6387: “vecFull”可能是“0”:    这不符合函数“CloseHandle”的规范。
+c:\user-wu\program-hdd\vsproject\systembackup\systembackup\backup.c(220): warning C6102: 在行“217”上使用了失败的函数调用中的“isExit”。
+c:\user-wu\program-hdd\vsproject\systembackup\systembackup\backup.c(267): warning C26115: 无法释放函数 'callCopyFile' 中的锁 'inputSec'。
+c:\user-wu\program-hdd\vsproject\systembackup\systembackup\main.c(28): warning C6031: 返回值被忽略: “scanf”。
+c:\user-wu\program-hdd\vsproject\systembackup\systembackup\main.c(29): warning C6031: 返回值被忽略: “getchar”。
+c:\user-wu\program-hdd\vsproject\systembackup\systembackup\saftfunc.c(15): warning C6271: 向“fprintf”传递了额外参数:    _Param_(3) 未由格式字符串使用。
+c:\user-wu\program-hdd\vsproject\systembackup\systembackup\setpath.c(40): warning C6031: 返回值被忽略: “sscanf”。
+c:\user-wu\program-hdd\vsproject\systembackup\systembackup\setpath.c(45): warning C6031: 返回值被忽略: “sscanf”。
+c:\user-wu\program-hdd\vsproject\systembackup\systembackup\showfile.c(75): warning C6328: 大小不匹配:  已将“__int64”作为 _Param_(4) 传递，但需要使用“int”来调用“fprintf”。

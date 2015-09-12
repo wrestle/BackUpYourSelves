@@ -1,0 +1,2 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<DEFECTS><DEFECT><SFA><FILEPATH>c:\user-wu\program-hdd\vsproject\systembackup\systembackup\</FILEPATH><FILENAME>saftfunc.c</FILENAME><LINE>15</LINE><COLUMN>10</COLUMN></SFA><DEFECTCODE>6271</DEFECTCODE><DESCRIPTION>向“fprintf”传递了额外参数:    _Param_(3) 未由格式字符串使用。</DESCRIPTION><FUNCTION>Malloc</FUNCTION><DECORATED>Malloc</DECORATED><FUNCLINE>3</FUNCLINE><PATH/></DEFECT></DEFECTS>
