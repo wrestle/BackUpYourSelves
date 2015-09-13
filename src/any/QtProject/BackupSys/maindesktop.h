@@ -17,6 +17,23 @@ public:
     explicit MainDesktop(QWidget *parent = 0);
     ~MainDesktop();
 
+    void told_thread_bp(){ // 作为startButton clicked 的槽函数，发送信号。信号由main中
+        emit thread_bp_start(); //pushThread 的 run_slot 槽函数接收。-
+    }
+
+    void told_thread_cp(){
+        emit thread_cp_start();
+    }
+
+    void receive_thread_cp_done(){
+        emit thread_cp_done();
+    }
+
+signals:
+    void send_path_toback(const QString from_path, const QString to_path);
+    void thread_bp_start();
+    void thread_cp_start();
+    void thread_cp_done();
 private slots:
     void on_exitButton_clicked();
 

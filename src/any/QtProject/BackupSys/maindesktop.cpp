@@ -13,11 +13,13 @@ MainDesktop::~MainDesktop()
     delete ui;
 }
 
+
+//******************************************************************************************
+//*********************************** SLOT 实现 *********************************************
 void MainDesktop::on_exitButton_clicked()
 {
     qApp->exit();
 }
-
 
 void MainDesktop::on_editfromPath_textChanged(const QString &arg1)
 {
@@ -64,4 +66,25 @@ void MainDesktop::on_startButton_clicked()
                               QStringLiteral("请填充路径"));
         return;
     }
+    else
+        emit send_path_toback(fromPath, toPath);
+    connect(ui->startButton, &QPushButton::clicked, this, &MainDesktop::told_thread_bp);
+
+    QDialog *subwindow = new QDialog(this);
+    QPushButton * sub_start = new QPushButton(subwindow);
+    QHBoxLayout * layouts = new QHBoxLayout(subwindow);
+    layouts->addWidget(sub_start);
+    subwindow->setAttribute(Qt::WA_DeleteOnClose);
+    sub_start->setAttribute(Qt::WA_DeleteOnClose);
+    sub_start->setText(QStringLiteral("点我开始多线程备份"));
+    connect(sub_start, &QPushButton::clicked, [=]() {
+        sub_start->setEnabled(false);
+        sub_start->setText(QStringLiteral("正在备份请稍后..."));
+    });
+    connect(this, &MainDesktop::thread_cp_done, [=](){
+        sub_start->setText(QStringLiteral("备份完成！"));
+    });
+    connect(sub_start, &QPushButton::clicked, this, &MainDesktop::told_thread_cp);
+    connect(ui->startButton, &QPushButton::clicked, subwindow, &QDialog::exec);
+
 }
