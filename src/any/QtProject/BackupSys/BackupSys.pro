@@ -1,6 +1,6 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2015-09-09T19:07:31
+# Project created by QtCreator 2015-09-13T10:49:12
 #
 #-------------------------------------------------
 
@@ -13,10 +13,8 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        backupsys.cpp \
-    result.cpp
+        maindesktop.cpp
 
-HEADERS  += backupsys.h \
-    result.h
+HEADERS  += maindesktop.h
 
-FORMS    += backupsys.ui
+FORMS    += maindesktop.ui
