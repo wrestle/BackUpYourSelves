@@ -4,6 +4,8 @@
 #include <QMainWindow>
 #include <QMessageBox>
 #include <QFileDialog>
+#include <QSemaphore>
+#include <QWidget>
 
 namespace Ui {
 class MainDesktop;

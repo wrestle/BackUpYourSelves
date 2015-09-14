@@ -39,9 +39,10 @@ bool start_bp(const QString localfrompath, const QString localtopath)
         else //如果不是文件夹
         {
             queEmptys.acquire(1);
-            //++files;
+            flag_locker.lock();
             filesVec.enqueue(combine(fileInfo.filePath(),
                                       destinDir.filePath(fileInfo.fileName())));
+            flag_locker.unlock();
             queFulls.release(1);
         }
     }
@@ -58,8 +59,7 @@ bool start_cp(const QString & src, const QString & dst)
 #if !defined(NOT_DEBUG_AT_ALL)
         if(fPath.lastModified() == tPath.lastModified())
         {
-
-            //qDebug() << QStringLiteral("文件相同，无需复制");
+            qDebug() << QStringLiteral("文件相同，无需复制");
         }
 #else
 #endif
@@ -99,3 +99,10 @@ void busyThread::run()
 }
 bool busyThread::pushThread_finish = 0;
 int busyThread::copyThread_finish = 0;
+
+void storeThread::run(){
+    int avail = queFulls.available();
+    queFulls.acquire(avail);
+    start_bp(from_path, to_path);
+    return;
+}

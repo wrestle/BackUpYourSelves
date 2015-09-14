@@ -9,7 +9,7 @@
 #include <QThread>
 #include <QMutex>
 #include <QDialog>
-
+#include <QDebug>
 static QMutex flag_locker;
 struct combine{
     combine(const QString arg1, const QString arg2):fp(arg1), tp(arg2){}
@@ -32,14 +32,12 @@ public:
         to_path = arg2;
     }
     void run_slot(){
+        filesVec.clear();
         this->start();
     }
 
 protected:
-    void run(){
-        start_bp(from_path, to_path);
-        return;
-    }
+    void run();
 private:
     QString from_path;
     QString to_path;

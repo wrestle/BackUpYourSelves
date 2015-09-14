@@ -1,5 +1,5 @@
 # BackUpYourSelves 
-# Version 1.7 
+# Version 2.0 
 一个用C语言和C++写的, Windows下的备份软件
 
 - C语言使用Console窗口
@@ -23,7 +23,17 @@
 	- 使用<`QThread`>
 	- 盘符可视化操作，当前是输入完整路径
 
+##兼容性
+- Qt工程编译的程序 在**Windows10** 暂时无法很好的工作，原因可能是 Windows在本次更新中又更换了系统API，其他平台一切正常
+- C 语言编写的程序依旧很好的工作在 Windows各平台上，因为使用 Windows API实现。
+- Qt 版本为 **5.x** 支持 **Lambda connect** 语法的版本
 ## TODO
 
 - 可以选择不备份某些文件夹
+- 将 C工程 实现跨平台
+- 使用 **Java** 重写本程序
 
+## 版本说明
+- **Version x.y**
+	- x 为语言数量
+	- y 为更新次数

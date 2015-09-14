@@ -1,6 +1,8 @@
 ﻿#include "maindesktop.h"
 #include "ui_maindesktop.h"
 
+extern QSemaphore queFull(20);
+
 MainDesktop::MainDesktop(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainDesktop)
@@ -60,6 +62,9 @@ void MainDesktop::on_toTool_clicked()
 
 void MainDesktop::on_startButton_clicked()
 {
+    //int avail = queFull.available();
+    //queFull.acquire(avail);
+
     if(fromPath.isEmpty() || toPath.isEmpty())
     {
         QMessageBox::critical(this, QStringLiteral("警告"),
@@ -68,23 +73,28 @@ void MainDesktop::on_startButton_clicked()
     }
     else
         emit send_path_toback(fromPath, toPath);
-    connect(ui->startButton, &QPushButton::clicked, this, &MainDesktop::told_thread_bp);
 
-    QDialog *subwindow = new QDialog(this);
+    QWidget *subwindow = new QWidget;
+    //QDialog *subwindows = new QDialog(this);
     QPushButton * sub_start = new QPushButton(subwindow);
     QHBoxLayout * layouts = new QHBoxLayout(subwindow);
     layouts->addWidget(sub_start);
     subwindow->setAttribute(Qt::WA_DeleteOnClose);
     sub_start->setAttribute(Qt::WA_DeleteOnClose);
     sub_start->setText(QStringLiteral("点我开始多线程备份"));
-    connect(sub_start, &QPushButton::clicked, [=]() {
-        sub_start->setEnabled(false);
-        sub_start->setText(QStringLiteral("正在备份请稍后..."));
-    });
     connect(this, &MainDesktop::thread_cp_done, [=](){
         sub_start->setText(QStringLiteral("备份完成！"));
     });
-    connect(sub_start, &QPushButton::clicked, this, &MainDesktop::told_thread_cp);
-    connect(ui->startButton, &QPushButton::clicked, subwindow, &QDialog::exec);
-
+    connect(sub_start, &QPushButton::clicked, [=]() {
+        sub_start->setEnabled(false);
+        sub_start->setText(QStringLiteral("正在备份请稍后..."));
+        told_thread_cp();
+    });
+    //connect(sub_start, &QPushButton::clicked, this, &MainDesktop::told_thread_cp);
+    //connect(ui->startButton, &QPushButton::clicked, this, &MainDesktop::told_thread_bp);
+    //connect(ui->startButton, &QPushButton::clicked, subwindow, &QWidget::show);
+    connect(ui->startButton, &QPushButton::clicked, [=](){
+        this->told_thread_bp();
+        subwindow->show();
+    });
 }
