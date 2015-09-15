@@ -1,17 +1,23 @@
 ﻿#include  <QDebug>
-#include "functional.h"
-QSemaphore queEmptys(20);
-QSemaphore queFulls(20);
 
+#include "functional.h"
+static QSemaphore queEmptys(20);
+static QSemaphore queFulls(20);
+static QQueue<combine> filesVec;
+static QMutex flag_locker;
+/**
+ * @brief start_bp
+ * @return false if Create Dir Fail
+ * To Create Dir and put the file path into queue which is used to copyThreads.
+ * Global Function
+ */
 bool start_bp(const QString localfrompath, const QString localtopath)
 {
     QDir sourceDir(localfrompath);
     QDir destinDir(localtopath);
-
     // 如果目的文件夹不存在，就创建一个
     if(!destinDir.exists())
     {
-        //++dirs;
         if(!destinDir.mkdir(destinDir.absolutePath()))
         {
             QMessageBox::critical(nullptr, QStringLiteral("警告"),
@@ -50,15 +56,20 @@ bool start_bp(const QString localfrompath, const QString localtopath)
     return true;
 }
 
+/**
+ * @brief start_cp
+ * @return false if exist without changed.
+ * Global function
+ */
 bool start_cp(const QString & src, const QString & dst)
 {
     QFileInfo fPath(src);
     QFileInfo tPath(dst);
 
-    if(tPath.exists())
+    if(tPath.exists()) // 如果待复制的文件已经存在
     {
 #if !defined(NOT_DEBUG_AT_ALL)
-        if(fPath.lastModified() == tPath.lastModified())
+        if(fPath.lastModified() == tPath.lastModified()) // 判断是否被改变
         {
             qDebug() << QStringLiteral("文件相同，无需复制");
             return false;
@@ -76,17 +87,27 @@ bool start_cp(const QString & src, const QString & dst)
     return true;
 }
 
+void storeThread::run_slot(){
+    filesVec.clear();
+    this->start();
+}
+
+/**
+ * @brief busyThread::run override
+ * Copy the File until the queue is EMPTY and pushThread is DONE.
+ */
 void busyThread::run()
 {
-     qDebug() << this->currentThread() << "start";
+#if !defined(NOT_DEBUG_AT_ALL)
+    qDebug() << this->currentThread() << "start";
+#endif
     while(true)
     {
-        //queFulls.acquire(); // 请求是否资源
-        if(!queFulls.tryAcquire(1, 30000))
-        {
+        if(!queFulls.tryAcquire(1, 5000)) // 尝试请求资源
+        {// 如果没有成功，即超时或者资源少于1
             locker.lock();
             if(pushThread_finish && filesVec.isEmpty())
-            {
+            { // 如果没有待复制文件，并且入队的线程已经结束，就结束线程
                 locker.unlock();
                 break;
             }
@@ -105,19 +126,51 @@ void busyThread::run()
         queEmptys.release(); // 使用资源完毕
     }
     flag_locker.lock();
-    ++copyThread_finish;
+    ++copyThread_finish; // 已经结束的线程
     flag_locker.unlock();
-    //emit add_finish(); // 发送信号给自身，判断是finish是否到达要求
+#if !defined(NOT_DEBUG_AT_ALL)
     qDebug() << this->currentThread() << "end";
+#endif
+    return;
+}
+
+/**
+ * @brief busyThread::told_thread_cp_done
+ * To tell MainWindow that copy file thread is done.
+ */
+void busyThread::told_thread_cp_done(){
+    flag_locker.lock();
+    if(copyThread_finish == 4)
+    {
+        emit thread_cp_done(newfiles);
+        newfiles = 0;
+        copyThread_finish = 0;
+        pushThread_finish = false;
+    }
+    flag_locker.unlock();
+}
+
+/**
+ * @brief busyThread::set_flag
+ * To Tell busyThread that pushThread is end.
+ */
+void busyThread::set_flag(bool flag)
+{
+    flag_locker.lock(); // 上方定义
+    pushThread_finish = flag;
+    flag_locker.unlock();
     return;
 }
 
 bool busyThread::pushThread_finish = 0;
 int busyThread::copyThread_finish = 0;
-unsigned long int busyThread::newfiles = 0;
+int busyThread::newfiles = 0;
 
+/**
+ * @brief storeThread::run override
+ */
 void storeThread::run(){
-    int avail = queFulls.available();
+    int avail = queFulls.available(); // Clear the avail Source to Zero Because of the real.
     queFulls.acquire(avail);
     start_bp(from_path, to_path);
     return;

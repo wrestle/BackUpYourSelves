@@ -1,5 +1,8 @@
 ﻿#ifndef MAINDESKTOP_H
 #define MAINDESKTOP_H
+#ifndef NOT_DEBUG_AL_ALL
+#define NOT_DEBUG_AL_ALL
+#endif
 
 #include <QMainWindow>
 #include <QMessageBox>
@@ -19,7 +22,7 @@ public:
     explicit MainDesktop(QWidget *parent = 0);
     ~MainDesktop();
 
-    void told_thread_bp(){ // 作为startButton clicked 的槽函数，发送信号。信号由main中
+    void told_thread_bp(){      // 作为startButton clicked 的槽函数，发送信号。信号由main中
         emit thread_bp_start(); //pushThread 的 run_slot 槽函数接收。-
     }
 
@@ -27,7 +30,9 @@ public:
         emit thread_cp_start();
     }
 
-    void receive_thread_cp_done(){
+    void receive_thread_cp_done(int local_number){ // it receive "thread_cp_done()"'s signal
+        QMessageBox::about(this, QStringLiteral("新增或被修改的文件数量"),
+                           QStringLiteral("数量： ")+QString::number(local_number));
         emit thread_cp_done();
     }
 
