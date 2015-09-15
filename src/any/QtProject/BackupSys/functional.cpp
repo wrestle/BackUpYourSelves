@@ -1,4 +1,5 @@
-﻿#include "functional.h"
+﻿#include  <QDebug>
+#include "functional.h"
 QSemaphore queEmptys(20);
 QSemaphore queFulls(20);
 
@@ -60,8 +61,10 @@ bool start_cp(const QString & src, const QString & dst)
         if(fPath.lastModified() == tPath.lastModified())
         {
             qDebug() << QStringLiteral("文件相同，无需复制");
+            return false;
         }
 #else
+        return false;
 #endif
     }
     else
@@ -75,30 +78,43 @@ bool start_cp(const QString & src, const QString & dst)
 
 void busyThread::run()
 {
-    while(1)
+     qDebug() << this->currentThread() << "start";
+    while(true)
     {
-        locker.lock();
-        if(pushThread_finish && filesVec.isEmpty())
+        //queFulls.acquire(); // 请求是否资源
+        if(!queFulls.tryAcquire(1, 30000))
         {
+            locker.lock();
+            if(pushThread_finish && filesVec.isEmpty())
+            {
+                locker.unlock();
+                break;
+            }
             locker.unlock();
-            break;
+            continue;
         }
-        locker.unlock();
-        queFulls.acquire(); // 请求是否资源
         locker.lock();
         combine local(filesVec.dequeue());
         locker.unlock();
-        start_cp(local.fp, local.tp);
+        if(start_cp(local.fp, local.tp))
+        {
+            locker.lock();
+            ++newfiles; //记录新增或修改的文件数量
+            locker.unlock();
+        }
         queEmptys.release(); // 使用资源完毕
     }
     flag_locker.lock();
     ++copyThread_finish;
     flag_locker.unlock();
     //emit add_finish(); // 发送信号给自身，判断是finish是否到达要求
+    qDebug() << this->currentThread() << "end";
     return;
 }
+
 bool busyThread::pushThread_finish = 0;
 int busyThread::copyThread_finish = 0;
+unsigned long int busyThread::newfiles = 0;
 
 void storeThread::run(){
     int avail = queFulls.available();

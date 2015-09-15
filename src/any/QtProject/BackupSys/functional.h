@@ -37,7 +37,7 @@ public:
     }
 
 protected:
-    void run();
+    void run() override;
 private:
     QString from_path;
     QString to_path;
@@ -47,7 +47,6 @@ private:
 class busyThread : public QThread{
     Q_OBJECT
 public:
-
     void run_slot(){
         this->start();
     }
@@ -61,28 +60,24 @@ public:
 
 signals:
     void thread_cp_done(); // 提示界面拷贝线程已经完毕
-    void add_finish();
 
 public slots:
-
     void told_thread_cp_done(){
-        emit thread_cp_done(); // 发送信号
-    }
-
-    void receive_add_finish(){
         flag_locker.lock();
         if(copyThread_finish == 4)
             emit thread_cp_done();
         flag_locker.unlock();
+        //emit thread_cp_done(); // 发送信号
     }
 
 protected:
-    void run();
+    void run() Q_DECL_OVERRIDE; // override
 
 private:
     QMutex locker;
     static int copyThread_finish;
     static bool pushThread_finish; //判断 入队线程是否结束
+    static unsigned long int newfiles;
 };
 
 #endif // FUNCTIONAL

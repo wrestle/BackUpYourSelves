@@ -1,7 +1,6 @@
 ﻿#include "maindesktop.h"
 #include "ui_maindesktop.h"
-
-extern QSemaphore queFull(20);
+#include <QDebug>
 
 MainDesktop::MainDesktop(QWidget *parent) :
     QMainWindow(parent),
@@ -74,14 +73,18 @@ void MainDesktop::on_startButton_clicked()
     else
         emit send_path_toback(fromPath, toPath);
 
+    qDebug() << " >>>>>>>>>>>>>After emit send_path_toback() ";
     QWidget *subwindow = new QWidget;
     //QDialog *subwindows = new QDialog(this);
     QPushButton * sub_start = new QPushButton(subwindow);
-    QHBoxLayout * layouts = new QHBoxLayout(subwindow);
+    QHBoxLayout * layouts = new QHBoxLayout;
     layouts->addWidget(sub_start);
+    subwindow->setLayout(layouts);
     subwindow->setAttribute(Qt::WA_DeleteOnClose);
     sub_start->setAttribute(Qt::WA_DeleteOnClose);
     sub_start->setText(QStringLiteral("点我开始多线程备份"));
+    subwindow->setWindowTitle(QStringLiteral("备份窗口"));
+    qDebug() << " >>>>>>>>>>>>After Initialize the new Windows";
     connect(this, &MainDesktop::thread_cp_done, [=](){
         sub_start->setText(QStringLiteral("备份完成！"));
     });
@@ -90,11 +93,11 @@ void MainDesktop::on_startButton_clicked()
         sub_start->setText(QStringLiteral("正在备份请稍后..."));
         told_thread_cp();
     });
+    qDebug() << " >>>>>>>>>>>>>Before Connect to show()";
     //connect(sub_start, &QPushButton::clicked, this, &MainDesktop::told_thread_cp);
     //connect(ui->startButton, &QPushButton::clicked, this, &MainDesktop::told_thread_bp);
     //connect(ui->startButton, &QPushButton::clicked, subwindow, &QWidget::show);
-    connect(ui->startButton, &QPushButton::clicked, [=](){
-        this->told_thread_bp();
-        subwindow->show();
-    });
+    this->told_thread_bp();
+    subwindow->show();
+    qDebug() << " >>>>>>>>>>>>>>After connect to show()";
 }
