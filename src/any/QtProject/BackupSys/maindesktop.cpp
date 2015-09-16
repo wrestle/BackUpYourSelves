@@ -90,8 +90,6 @@ void MainDesktop::on_startButton_clicked()
     QHBoxLayout * layouts = new QHBoxLayout(subwindow);
     layouts->addWidget(sub_start);
     subwindow->setLayout(layouts);
-    subwindow->setAttribute(Qt::WA_DeleteOnClose);
-    sub_start->setAttribute(Qt::WA_DeleteOnClose);
     sub_start->setText(QStringLiteral("点我开始多线程备份"));
     subwindow->setWindowTitle(QStringLiteral("备份窗口"));
 #if !defined(NOT_DEBUG_AT_ALL)
