@@ -3,8 +3,8 @@
 */
 #ifndef FUNCTIONAL_H_INCLUDE
 #define FUNCTIONAL_H_INCLUDE
-#ifndef NOT_DEBUG_AL_ALL
-#define NOT_DEBUG_AL_ALL
+#ifndef NOT_DEBUG_AT_ALL
+#define NOT_DEBUG_AT_ALL
 #endif
 #include <QFileDialog>
 #include <QMessageBox>
@@ -14,8 +14,10 @@
 #include <QThread>
 #include <QMutex>
 #include <QDialog>
+#include <fstream>
+#include <ctime>
 
-#if !defined(NOT_DEBUG_AL_ALL)
+#if !defined(NOT_DEBUG_AT_ALL)
 #include <QDebug>
 #endif
 
@@ -26,6 +28,7 @@ bool start_bp(const QString localfrompath, const QString localtopath);
 
 /**
  * @brief The storeThread class
+ * @version v1.7
  * 该类的作用为将待复制的文件路径压入队列中
  */
 class storeThread : public QThread{
@@ -46,6 +49,7 @@ private:
 
 /**
  * @brief The busyThread class
+ * @version v1.7
  * 该类作用为，将队列中的文件复制。
  */
 class busyThread : public QThread{
@@ -54,10 +58,11 @@ public:
     void run_slot(){
         this->start();
     }
-    static void set_flag(bool flag);
+    static void set_flag(bool flag);  // 设置文件路径入队线程是否完成的标志
 
 signals:
-    void thread_cp_done(int numbers); // 提示界面拷贝线程已经完毕
+    void thread_cp_done(int numbers); // 提示界面 MainWindow类对象 拷贝线程已经完毕
+
 
 public slots:
     void told_thread_cp_done(); // 让 copyThreads 与 MainWindow 交互
@@ -74,6 +79,7 @@ private:
 
 /**
  * @brief The combine struct
+ * @version v1.0
  * 将备份路径和存储路径放在一个单元内
  */
 struct combine{

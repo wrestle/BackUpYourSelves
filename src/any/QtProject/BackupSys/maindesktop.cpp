@@ -14,6 +14,13 @@ MainDesktop::~MainDesktop()
     delete ui;
 }
 
+void MainDesktop::receive_thread_cp_done(int local_number){ // 接收 thread_cp_done() 信号
+    QMessageBox::about(this, QStringLiteral("新增或被修改的文件数量"),
+                       QStringLiteral("数量： ")+QString::number(local_number));
+
+    emit thread_cp_done();
+}
+
 
 //******************************************************************************************
 //*********************************** SLOT 实现 *********************************************
@@ -82,10 +89,11 @@ void MainDesktop::on_startButton_clicked()
     }
     else
         emit send_path_toback(fromPath, toPath);
+    ui->startButton->setDisabled(true);
 #if !defined(NOT_DEBUG_AT_ALL)
     qDebug() << " >>>>>>>>>>>>>After emit send_path_toback() ";
 #endif
-    QWidget *subwindow = new QWidget;                      // 设置界面
+    QWidget *subwindow = new QWidget;                    //开始创建第二界面
     QPushButton * sub_start = new QPushButton(subwindow);
     QHBoxLayout * layouts = new QHBoxLayout(subwindow);
     layouts->addWidget(sub_start);
@@ -95,7 +103,7 @@ void MainDesktop::on_startButton_clicked()
 #if !defined(NOT_DEBUG_AT_ALL)
     qDebug() << " >>>>>>>>>>>>After Initialize the new Windows";
 #endif
-
+    connect(subwindow, &QWidget::close, subwindow, &QWidget::deleteLater);
     connect(this, &MainDesktop::thread_cp_done, [=](){    // 如果拷贝线程结束了，就通知用户
         sub_start->setText(QStringLiteral("备份完成！"));
     });
@@ -106,7 +114,9 @@ void MainDesktop::on_startButton_clicked()
     });
     this->told_thread_bp();
     subwindow->show();
+    ui->startButton->setDisabled(false);
 #if !defined(NOT_DEBUG_AT_ALL)
     qDebug() << " >>>>>>>>>>>>>>After connect to show()";
 #endif
+
 }

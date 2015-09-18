@@ -1,7 +1,7 @@
 ﻿#ifndef MAINDESKTOP_H
 #define MAINDESKTOP_H
-#ifndef NOT_DEBUG_AL_ALL
-#define NOT_DEBUG_AL_ALL
+#ifndef NOT_DEBUG_AT_ALL
+#define NOT_DEBUG_AT_ALL
 #endif
 
 #include <QMainWindow>
@@ -9,6 +9,7 @@
 #include <QFileDialog>
 #include <QSemaphore>
 #include <QWidget>
+#include <fstream>
 
 namespace Ui {
 class MainDesktop;
@@ -30,17 +31,14 @@ public:
         emit thread_cp_start();
     }
 
-    void receive_thread_cp_done(int local_number){ // it receive "thread_cp_done()"'s signal
-        QMessageBox::about(this, QStringLiteral("新增或被修改的文件数量"),
-                           QStringLiteral("数量： ")+QString::number(local_number));
-        emit thread_cp_done();
-    }
+    void receive_thread_cp_done(int local_number);
 
 signals:
     void send_path_toback(const QString from_path, const QString to_path);
     void thread_bp_start();
     void thread_cp_start();
-    void thread_cp_done();
+    void thread_cp_done(); //该类中的本信号，用于通知 startButton 触发的事件中的 sub_start
+                           //复制线程已经结束。
 private slots:
     void on_exitButton_clicked();
 
