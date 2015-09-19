@@ -1,5 +1,5 @@
 # BackUpYourSelves 
-# Version 2.2 
+# Version 2.3 
 一个用C语言和C++写的, Windows下的备份软件
 
 - C语言使用Console窗口
@@ -29,6 +29,7 @@
 - C 语言编写的程序依旧很好的工作在 Windows各平台上，因为使用 **Windows API**实现(尿性太高，并不想解释)。
 - Qt 版本为 **5.x** 支持 **Lambda connect** 语法的版本
 	- `CONFIG+=C++11`
+- 在编译完成以后，将文件 `readme` 拷贝到程序目录下。
 
 ## TODO
 

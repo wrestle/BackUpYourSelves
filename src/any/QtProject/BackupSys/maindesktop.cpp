@@ -1,12 +1,63 @@
 ﻿#include "maindesktop.h"
 #include "ui_maindesktop.h"
+#ifndef NOT_DEBUG_AT_ALL
 #include <QDebug>
+#endif
 
 MainDesktop::MainDesktop(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainDesktop)
 {
     ui->setupUi(this);
+    this->setWindowTitle("BackupSystem");
+    QObject::connect(ui->aboutApp, &QAction::triggered, [](){ // 创建窗口显示信息
+        QFile readme("readme");
+        readme.open(QFile::ReadOnly | QFile::Text);
+        QTextStream reading(&readme);
+        QWidget * show_readme = new QWidget;
+        show_readme->setWindowTitle(QStringLiteral("使用说明"));
+        QTextBrowser * browse_readme = new QTextBrowser(show_readme);
+        browse_readme->setText(reading.readAll());
+        QHBoxLayout * layout = new QHBoxLayout(show_readme);
+        layout->addWidget(browse_readme);
+        show_readme->show();
+    });
+    QObject::connect(ui->errorApp, &QAction::triggered, [=](){
+        QFile error_log("CopyErrorLog");
+        QWidget * show_errorlog = new QWidget;
+        show_errorlog->setWindowTitle(QStringLiteral("错误信息"));
+        QTextBrowser * browse_errorlog = new QTextBrowser(show_errorlog);
+        QHBoxLayout * layout = new QHBoxLayout(show_errorlog);
+        layout->addWidget(browse_errorlog);
+        if(!error_log.open(QFile::ReadOnly | QFile::Text))
+        {
+              browse_errorlog->setText("Empty, No Such Infomation");
+        }
+        else
+        {
+            QTextStream reading(&error_log);
+            browse_errorlog->setText(reading.readAll());
+        }
+        show_errorlog->show();
+    });
+    QObject::connect(ui->InfoApp, &QAction::triggered, [](){
+        QFile success_log("CopySuccessLog");
+        QWidget * show_succeed_log = new QWidget;
+        show_succeed_log->setWindowTitle(QStringLiteral("备份信息"));
+        QTextBrowser * browse_succeed_log = new QTextBrowser(show_succeed_log);
+        QHBoxLayout * layout = new QHBoxLayout(show_succeed_log);
+        layout->addWidget(browse_succeed_log);
+        if(!success_log.open(QFile::ReadOnly | QFile::Text))
+        {
+            browse_succeed_log->setText("Empty, No Such Infomation");
+        }
+        else
+        {
+            QTextStream reading(&success_log);
+            browse_succeed_log->setText(reading.readAll());
+        }
+        show_succeed_log->show();
+    });
 }
 
 MainDesktop::~MainDesktop()
@@ -14,7 +65,7 @@ MainDesktop::~MainDesktop()
     delete ui;
 }
 
-void MainDesktop::receive_thread_cp_done(int local_number){ // 接收 thread_cp_done() 信号
+void MainDesktop::receive_thread_cp_done(int local_number){ // it receive "thread_cp_done()"'s signal
     QMessageBox::about(this, QStringLiteral("新增或被修改的文件数量"),
                        QStringLiteral("数量： ")+QString::number(local_number));
 
@@ -93,7 +144,7 @@ void MainDesktop::on_startButton_clicked()
 #if !defined(NOT_DEBUG_AT_ALL)
     qDebug() << " >>>>>>>>>>>>>After emit send_path_toback() ";
 #endif
-    QWidget *subwindow = new QWidget;                    //开始创建第二界面
+    QWidget *subwindow = new QWidget;
     QPushButton * sub_start = new QPushButton(subwindow);
     QHBoxLayout * layouts = new QHBoxLayout(subwindow);
     layouts->addWidget(sub_start);
@@ -118,5 +169,5 @@ void MainDesktop::on_startButton_clicked()
 #if !defined(NOT_DEBUG_AT_ALL)
     qDebug() << " >>>>>>>>>>>>>>After connect to show()";
 #endif
-
 }
+

@@ -6,13 +6,11 @@ static QSemaphore queFulls(20);
 static QQueue<combine> filesVec;
 static QMutex flag_locker;
 
-static std::ofstream writing; // 写入被本次复制的文件
-static std::ofstream err_log; // 写入本次失败复制的文件
-
+static std::ofstream writing;
+static std::ofstream err_log;
 /**
  * @brief start_bp
  * @return false if Create Dir Fail
- * @version v2.1
  * To Create Dir and put the file path into queue which is used to copyThreads.
  * Global Function
  */
@@ -63,7 +61,6 @@ bool start_bp(const QString localfrompath, const QString localtopath)
 /**
  * @brief start_cp
  * @return false if exist without changed.
- * @version v2.2
  * Global function
  */
 bool start_cp(const QString & src, const QString & dst)
@@ -99,7 +96,6 @@ void storeThread::run_slot(){
 
 /**
  * @brief busyThread::run override
- * @version v2.2
  * Copy the File until the queue is EMPTY and pushThread is DONE.
  */
 void busyThread::run()
@@ -149,7 +145,6 @@ void busyThread::run()
 
 /**
  * @brief busyThread::told_thread_cp_done
- * @version v2.2
  * To tell MainWindow that copy file thread is done.
  */
 void busyThread::told_thread_cp_done(){
@@ -159,7 +154,7 @@ void busyThread::told_thread_cp_done(){
         writing.close();
         err_log.close();
         emit thread_cp_done(newfiles);
-        newfiles = 0;              //等待下一次的复制
+        newfiles = 0;
         copyThread_finish = 0;
         pushThread_finish = false;
     }
@@ -168,7 +163,6 @@ void busyThread::told_thread_cp_done(){
 
 /**
  * @brief busyThread::set_flag
- * @version v2.1
  * To Tell busyThread that pushThread is end.
  */
 void busyThread::set_flag(bool flag)
@@ -185,19 +179,18 @@ int busyThread::newfiles = 0;
 
 /**
  * @brief storeThread::run override
- * @version v2.2
  */
 void storeThread::run(){
     time_t time_now = time(0);
     char tmp[64];
     strftime( tmp, sizeof(tmp), "%Y/%m/%d %X %A 本年第%j天 %z",localtime(&time_now) );
     std::string time(tmp);
-    int avail = queFulls.available(); // 因为一开始的队列中为空
+    int avail = queFulls.available(); // Clear the avail Source to Zero Because of the real.
     queFulls.acquire(avail);
     err_log.open("CopyErrorLog", std::ios_base::app);
     err_log << time << std::endl;
     writing.open("CopySuccessLog", std::ios_base::out | std::ios_base::trunc);
     writing << time << std::endl;
-    start_bp(from_path, to_path); //开始将文件路径入队
+    start_bp(from_path, to_path);
     return;
 }

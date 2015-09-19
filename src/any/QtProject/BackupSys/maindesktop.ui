@@ -133,9 +133,24 @@
      <x>0</x>
      <y>0</y>
      <width>385</width>
-     <height>23</height>
+     <height>27</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menu">
+    <property name="title">
+     <string>帮助(&amp;H)</string>
+    </property>
+    <addaction name="aboutApp"/>
+   </widget>
+   <widget class="QMenu" name="menu_F">
+    <property name="title">
+     <string>文件(&amp;F)</string>
+    </property>
+    <addaction name="errorApp"/>
+    <addaction name="InfoApp"/>
+   </widget>
+   <addaction name="menu"/>
+   <addaction name="menu_F"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -146,6 +161,24 @@
    </attribute>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
+  <action name="aboutApp">
+   <property name="text">
+    <string>关于(&amp;A)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+A</string>
+   </property>
+  </action>
+  <action name="errorApp">
+   <property name="text">
+    <string>错误信息(&amp;E)</string>
+   </property>
+  </action>
+  <action name="InfoApp">
+   <property name="text">
+    <string>备份信息(&amp;I)</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>

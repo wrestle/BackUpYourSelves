@@ -1,7 +1,7 @@
 ﻿#ifndef MAINDESKTOP_H
 #define MAINDESKTOP_H
-#ifndef NOT_DEBUG_AT_ALL
-#define NOT_DEBUG_AT_ALL
+#ifndef NOT_DEBUG_AL_ALL
+#define NOT_DEBUG_AL_ALL
 #endif
 
 #include <QMainWindow>
@@ -10,6 +10,7 @@
 #include <QSemaphore>
 #include <QWidget>
 #include <fstream>
+#include <QTextBrowser>
 
 namespace Ui {
 class MainDesktop;
@@ -37,8 +38,8 @@ signals:
     void send_path_toback(const QString from_path, const QString to_path);
     void thread_bp_start();
     void thread_cp_start();
-    void thread_cp_done(); //该类中的本信号，用于通知 startButton 触发的事件中的 sub_start
-                           //复制线程已经结束。
+    void thread_cp_done();
+
 private slots:
     void on_exitButton_clicked();
 
