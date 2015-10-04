@@ -8,28 +8,11 @@ HANDLE copyThread[SELF_THREADS_LIMIT]; /* 将路径弹出队列并复制的线程 */
 CRITICAL_SECTION inputSec, testSec;
 
 const char * get_backup_topath(); /* setPath.h */
-
+void repl_str(char * src); /* setPath.h */
 
 /* 计算时间 */
 static clock_t start, finish; /* 备份开始，结束时间 */
 static double Total_time;    /* 计算备份花费时间 */
-
-/**
- * @version  1.0 2015/10/03
- * @author   wushengxin
- * @param    src 需要调整的字符串
- * @function 将输入的字符串种的 '/' 替换成 '\'
- */
-static void repl_str(char * src)
-{
-	size_t length = strlen(src);
-	for (size_t i = 0; i <= length; ++i)
-	{
-		if (src[i] == '/')
-			src[i] = '\\';
-	}
-	return;
-}
 
 /**
  * @version  1.0 2015/10/03

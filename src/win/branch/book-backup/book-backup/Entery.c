@@ -43,6 +43,7 @@ int main(int argc, char* argv[])
 			show_hist_path();
 			break;
 		case 4:
+			/* Stay For Yourselves */
 			break;
 		case 5:
 			exit(1);
