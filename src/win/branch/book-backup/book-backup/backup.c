@@ -5,7 +5,7 @@ static queue filesVec;            /* 队列主体 */
 HANDLE vecEmpty, vecFull; /* 两个 Semaphore */
 HANDLE pushThread;       /* 将路径加入队列中的线程 */
 HANDLE copyThread[SELF_THREADS_LIMIT]; /* 将路径弹出队列并复制的线程 */
-CRITICAL_SECTION inputSec, testSec;
+static CRITICAL_SECTION inputSec, testSec, manageSec; /* 检查和输出， 测试， 操作fileVec */
 
 const char * get_backup_topath(); /* setPath.h */
 void repl_str(char * src); /* setPath.h */
@@ -21,7 +21,7 @@ static double Total_time;    /* 计算备份花费时间 */
 			 srcfile 源路径的文件
  * @function 判断两个文件的最后修改时间是否相同
  */
-static int is_changed(const char * dstfile, const char * srcfile)
+static int not_changed(const char * __restrict dstfile, const char * __restrict srcfile)
 {
 	struct stat dst_stat, src_stat;
 	stat(dstfile, &dst_stat);
@@ -75,10 +75,10 @@ static unsigned int __stdcall callCopyFile(void * para)
 			continue;
 		}
 
-		EnterCriticalSection(&inputSec); /* 这个关键段的添加十分重要，是读取时候的核心 */
+		EnterCriticalSection(&manageSec); /* 这个关键段的添加十分重要，是读取时候的核心 */
 		if (!(localCom = filesVec.PopFront(address))) /* 每次弹出时一定要防止资源争夺带来的冲突 */
 			continue;
-		LeaveCriticalSection(&inputSec);
+		LeaveCriticalSection(&manageSec);
 
 		dst_path = localCom->dst_to_path;
 		src_path = localCom->src_from_path;
@@ -113,6 +113,7 @@ void sec_main_windows()
 	do{
 		InitializeCriticalSection(&inputSec); /* 每次使用前必须初始化的四个变量 */
 		InitializeCriticalSection(&testSec);
+		InitializeCriticalSection(&manageSec);
 		vecEmpty = CreateSemaphoreA(NULL, 20, 20, NULL); /* 显式使用 A 版本 */
 		vecFull = CreateSemaphoreA(NULL, 0, 20, NULL);
 
@@ -174,6 +175,7 @@ void sec_main_windows()
 		/* 销毁使用的 CS */
 		DeleteCriticalSection(&inputSec);
 		DeleteCriticalSection(&testSec);
+		DeleteCriticalSection(&manageSec);
 		/* 销毁信号量 */
 		CloseHandle(vecEmpty);
 		CloseHandle(vecFull);
@@ -217,7 +219,7 @@ char * make_path(const char * src)
 	return loc_buf;
 }
 
-void adjust_path(char * src_path, char * src_file)
+void adjust_path(char * __restrict src_path, char * __restrict src_file)
 {
 	size_t length = strlen(src_file); /* 两个参数的长度在此函数调用之前必定一致 */
 	if (src_path != NULL)
@@ -253,7 +255,7 @@ void rele_path(char * src)
 	return;
 }
 
-void backup(const char * path, const char * bpath)
+void backup(const char * __restrict path, const char * __restrict bpath)
 {
 	/* 用来配合 setjmp和longjmp重新获取句柄HANDLE的变量 */
 	int times = 0;
@@ -321,7 +323,7 @@ void backup(const char * path, const char * bpath)
 			strcat(tmp_to_file_buf, fileData.cFileName);
 			if (_access(tmp_to_file_buf, 0) == 0) /*如果目标文件存在*/
 			{
-				if (is_changed(tmp_from_file_buf, tmp_to_file_buf))
+				if (not_changed(tmp_from_file_buf, tmp_to_file_buf))
 				{
 					rele_path(tmp_from_file_buf);
 					rele_path(tmp_to_file_buf);
@@ -334,7 +336,9 @@ void backup(const char * path, const char * bpath)
 
 			WaitForSingleObject(vecEmpty, INFINITE);
 
+			EnterCriticalSection(&manageSec);
 			filesVec.PushBack(&filesVec, tmp_from_file_buf, tmp_to_file_buf);
+			LeaveCriticalSection(&manageSec);
 			ReleaseSemaphore(vecFull, 1, NULL);
 		}
 		rele_path(tmp_from_file_buf);

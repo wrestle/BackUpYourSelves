@@ -16,7 +16,7 @@ void Free_s(void * input);
 typedef struct _vector_queue queue;
 typedef struct _combine combine;
 
-typedef int             (*fpPushBack)(queue *, const char *, const char *);
+typedef int(*fpPushBack)(queue * __restrict, const char * __restrict, const char * __restrict);
 typedef combine * (*fpPopFront)(queue *);
 typedef void            (*fpDelete)(queue *);
 

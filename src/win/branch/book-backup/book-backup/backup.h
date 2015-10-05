@@ -30,7 +30,7 @@ void sec_main_windows();
 bpath 目的路径
 * @function 用于遍历查找备份文件，将之压入队列中
 */
-void backup(const char * path, const char * bpath);
+void backup(const char * __restrict path, const char * __restrict bpath);
 
 /**
 * @version 1.0 2015/09/28
@@ -55,7 +55,7 @@ void rele_path(char * src);
 src_file 用于添加找到的目录名，形成新的目录路径
 * @function 用于调整用户从键盘输入的路径字符串，使他们变得一致，便于处理
 */
-void adjust_path(char * src_path, char * src_file);
+void adjust_path(char * __restrict src_path, char * __restrict src_file);
 
 
 #endif

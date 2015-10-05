@@ -3,7 +3,7 @@
 #include "setPath.h"
 #include "backup.h"
 
-extern DEFAULT_TO_PATH; /* setPath.c */
+extern const char * DEFAULT_TO_PATH; /* setPath.c */
 
 int main(int argc, char* argv[])
 {

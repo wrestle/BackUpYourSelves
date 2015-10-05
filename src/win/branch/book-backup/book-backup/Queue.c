@@ -1,6 +1,6 @@
 #include "Queue.h"
 
-static CRITICAL_SECTION empty_sec;
+static CRITICAL_SECTION empty_sec; /* 用于判断队列是否为空时的关键段 */
 const int CAPCITY = CAPCITY_OF_QUEUE;
 /**
  * @version  1.0 2015/10/03
@@ -23,7 +23,7 @@ static void del_queue(queue * object)
 			 dst    目的路径
  * @function 将外部传入的<源路径，目的路径> 存入队列中
  */
-static int push_back(queue * object, const char * src, const char * dst)
+static int push_back(queue * __restrict object, const char * __restrict src, const char * __restrict dst)
 {
 	int times = 0;
 	char*    loc_src = NULL; /* 本地变量，尽量利用寄存器以及缓存 */
