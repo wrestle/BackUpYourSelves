@@ -5,7 +5,7 @@ static queue filesVec;            /* 队列主体 */
 HANDLE vecEmpty, vecFull; /* 两个 Semaphore */
 HANDLE pushThread;       /* 将路径加入队列中的线程 */
 HANDLE copyThread[SELF_THREADS_LIMIT]; /* 将路径弹出队列并复制的线程 */
-static CRITICAL_SECTION inputSec, testSec, manageSec; /* 检查和输出， 测试， 操作fileVec */
+static CRITICAL_SECTION inputSec, testSec; /* 检查和输出， 测试 */
 
 const char * get_backup_topath(); /* setPath.h */
 void repl_str(char * src); /* setPath.h */
@@ -74,15 +74,12 @@ static unsigned int __stdcall callCopyFile(void * para)
 			fprintf(stderr, "Copy Thread wait time out!\n");
 			continue;
 		}
-
-		EnterCriticalSection(&manageSec); /* 这个关键段的添加十分重要，是读取时候的核心 */
+		/* 此处不再需要临界区/关键段的保护，因为本身 fileVec 提供了线程保护 */
 		if (!(localCom = filesVec.PopFront(address))) /* 每次弹出时一定要防止资源争夺带来的冲突 */
 			continue;
-		LeaveCriticalSection(&manageSec);
 
 		dst_path = localCom->dst_to_path;
 		src_path = localCom->src_from_path;
-
 		if (CopyFileA(src_path, dst_path, FALSE) == 0) /* 显式使用 CopyFileA 函数，而不是使用 CopyFile 宏 */
 		{
 			EnterCriticalSection(&inputSec); /* 这一段不添加也是合理的，只是不清楚为何不复制而已 */
@@ -98,7 +95,7 @@ static unsigned int __stdcall callCopyFile(void * para)
 			}
 			LeaveCriticalSection(&inputSec);
 		}
-		Free_s(src_path);
+		Free_s(src_path); /* 即使是 NULL 也不会破坏内存分配的数据结构 */
 		Free_s(dst_path);
 		Free_s(localCom);
 		ReleaseSemaphore(vecEmpty, 1, NULL); /* 是放一个信号量 */
@@ -113,7 +110,7 @@ void sec_main_windows()
 	do{
 		InitializeCriticalSection(&inputSec); /* 每次使用前必须初始化的四个变量 */
 		InitializeCriticalSection(&testSec);
-		InitializeCriticalSection(&manageSec);
+//		InitializeCriticalSection(&manageSec);
 		vecEmpty = CreateSemaphoreA(NULL, 20, 20, NULL); /* 显式使用 A 版本 */
 		vecFull = CreateSemaphoreA(NULL, 0, 20, NULL);
 
@@ -175,7 +172,7 @@ void sec_main_windows()
 		/* 销毁使用的 CS */
 		DeleteCriticalSection(&inputSec);
 		DeleteCriticalSection(&testSec);
-		DeleteCriticalSection(&manageSec);
+//		DeleteCriticalSection(&manageSec);
 		/* 销毁信号量 */
 		CloseHandle(vecEmpty);
 		CloseHandle(vecFull);
@@ -336,9 +333,9 @@ void backup(const char * __restrict path, const char * __restrict bpath)
 
 			WaitForSingleObject(vecEmpty, INFINITE);
 
-			EnterCriticalSection(&manageSec);
+			//EnterCriticalSection(&manageSec);
 			filesVec.PushBack(&filesVec, tmp_from_file_buf, tmp_to_file_buf);
-			LeaveCriticalSection(&manageSec);
+			//LeaveCriticalSection(&manageSec);
 			ReleaseSemaphore(vecFull, 1, NULL);
 		}
 		rele_path(tmp_from_file_buf);
