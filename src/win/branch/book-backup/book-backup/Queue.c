@@ -2,6 +2,7 @@
 
 //static CRITICAL_SECTION empty_sec; /* 用于判断队列是否为空时的关键段 */
 static CRITICAL_SECTION io_section; /* 提供线程安全 */
+SRWLOCK rw_mutex; /* 读写锁 */
 const int CAPCITY = CAPCITY_OF_QUEUE;
 /**
  * @version  1.0 2015/10/03
@@ -58,10 +59,12 @@ static int push_back(queue * __restrict object, const char * __restrict src, con
 	loc_que->path_contain[rear++] = loc_com; /* 将本地路径加入实体 */
 	loc_que->rear = (rear % CAPCITY);     /* 用数组实现循环队列的步骤 */
 //	EnterCriticalSection(&empty_sec);
+	AcquireSRWLockExclusive(&rw_mutex);
 	if (loc_que->rear == loc_que->front)  
 	{
 		loc_que->empty = 0;
 	}
+	ReleaseSRWLockExclusive(&rw_mutex);
 //	LeaveCriticalSection(&empty_sec);
 	LeaveCriticalSection(&io_section);
 	return 0;
@@ -81,10 +84,12 @@ static combine * pop_front(queue* object)
 	object->front = ((object->front) + 1) % CAPCITY; /*完成出队*/
 
 //	EnterCriticalSection(&empty_sec);
+	AcquireSRWLockExclusive(&rw_mutex);
 	if (object->front == object->rear)
 		object->empty = 1;
 	else
 		object->empty = 0;
+	ReleaseSRWLockExclusive(&rw_mutex);
 //	LeaveCriticalSection(&empty_sec);
 	LeaveCriticalSection(&io_section);
 	return loc_com;
@@ -109,5 +114,6 @@ int newQueue(queue * object)
 	loc_que->Delete = del_queue;
 //	InitializeCriticalSection(&empty_sec);
 	InitializeCriticalSection(&io_section);
+	InitializeSRWLock(&rw_mutex);
 	return 0;
 }

@@ -9,6 +9,7 @@ static CRITICAL_SECTION inputSec, testSec; /* 检查和输出， 测试 */
 
 const char * get_backup_topath(); /* setPath.h */
 void repl_str(char * src); /* setPath.h */
+extern SRWLOCK rw_mutex; /* Queue.c 读写锁 */
 
 /* 计算时间 */
 static clock_t start, finish; /* 备份开始，结束时间 */
@@ -58,10 +59,12 @@ static unsigned int __stdcall callCopyFile(void * para)
 	{
 		char * dst_path = NULL;
 		char * src_path = NULL;
-		EnterCriticalSection(&testSec);
+		//EnterCriticalSection(&testSec)
+		AcquireSRWLockShared(&rw_mutex);
 		GetExitCodeThread(pushThread, &isExit); /* 查看入队的线程是否已经结束 */
 		empty = address->empty; /* 查看此时队列是否为空 */
-		LeaveCriticalSection(&testSec);
+		ReleaseSRWLockShared(&rw_mutex);
+		//LeaveCriticalSection(&testSec);
 		if (isExit != STILL_ACTIVE && empty) /* STILL_ACTIVE 代表还在运行 */
 		{
 			puts("Push Thread is End!\n");
