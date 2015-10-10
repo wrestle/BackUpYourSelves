@@ -78,7 +78,7 @@ static unsigned int __stdcall callCopyFile(void * para)
 			continue;
 		}
 		/* 此处不再需要临界区/关键段的保护，因为本身 fileVec 提供了线程保护 */
-		if (!(localCom = filesVec.PopFront(address))) /* 每次弹出时一定要防止资源争夺带来的冲突 */
+		if ((localCom = filesVec.PopFront(address)) == NULL) /* 每次弹出时一定要防止资源争夺带来的冲突 */
 			continue;
 
 		dst_path = localCom->dst_to_path;
@@ -137,21 +137,21 @@ void sec_main_windows()
 		{
 			jmp_buf enter_path_jmp; 
 		case 1:
-		{
+		{           /* 考虑 140 ~ 153 行，是否能够使用函数包裹，而不是将裸代码放置在这里 */
 			char tmpBuf[MAX_ENTER_PATH], tmpPath[MAX_ENTER_PATH]; /* 使用栈分配空间，因为只用分配一次 */
 			setjmp(enter_path_jmp);         /* enter jump to there */
 			puts(" Enter the Full Path You want to BackUp(e.g: C:/Programing/)");
 			fprintf(stdout, " Or Enter q to back to select\nYour Enter : ");
 			fgets(tmpBuf, MAX_ENTER_PATH, stdin);
 			sscanf(tmpBuf, "%s", tmpPath);
-			if (_access(tmpPath, 0) != 0)   /*检查路径是否存在，有效*/
+			if (_access(tmpPath, 0) != 0)   /* 检查路径是否 存在/有效 */
 			{
 				if (tmpPath[0] == 'q' || tmpPath[0] == 'Q') 
 					longjmp(select_jmp, 0); /* 回到可以选择返回的界面 */
 				fprintf(stderr, "The Path You Enter is Not Exit! \n Try Again : ");
 				longjmp(enter_path_jmp, 0); /* enter jump from here */
 			}
-			/* 这里调用线程创建函数 _beginthreadex,各个参数的意义可以上网查询 */
+			/* 这里调用线程创建函数 _beginthreadex,各个参数的意义可以上 MSDN 查询 */
 			pushThread = (HANDLE)_beginthreadex(NULL, 0, callBackup, (void*)tmpPath, 0, NULL);
 			for (int i = 0; i < SELF_THREADS_LIMIT; ++i)
 			{
@@ -209,7 +209,7 @@ char * make_path(const char * src)
 	char * loc_buf = malloc(len_of_dst + 1);
 	if (loc_buf == NULL)
 	{
-		fprintf(stderr, "ERROR OCCUR When malloc the memory at %s\n Try the %d th times", __LINE__, times + 1);
+		fprintf(stderr, "ERROR OCCUR When allocate the memory at %s : %d\n Try the %d th times",__FILE__ , __LINE__, times + 1);
 		if (times++ < TRY_TIMES)
 			longjmp(alloc_jmp, 0); /* alloc_jmp from here */
 		return NULL;
@@ -262,7 +262,7 @@ void backup(const char * __restrict path, const char * __restrict bpath)
 	/** 操作时获取文件夹，文件信息的的必要变量,为了WIN API区别，这里变量的命名使用驼峰法 **/
 	HANDLE fileHandle;
 	WIN32_FIND_DATAA fileData;
-
+	 
 	char * from_path_buf = make_path(path);
 	char * to_path_buf = make_path(bpath);
 	char * find_path_buf = make_path(path); /* 用于 Windows API FindFirstFile */
